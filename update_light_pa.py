@@ -3,6 +3,7 @@ import time
 from datetime import datetime, timedelta, timezone
 
 import requests
+import argparse
 
 
 # === CONFIG YOU CAN SAFELY COMMIT (no secrets) ====================
@@ -170,6 +171,15 @@ def set_lifx_color(color_hex: str):
         raise RuntimeError(f"LIFX API error {resp.status_code}: {resp.text}")
 
 
+
+def test_set_color(hex_code: str):
+    """Simple function to set the LIFX light to a manual color."""
+    print(f"Manually setting LIFX color to {hex_code}")
+    set_lifx_color(hex_code)
+    print("Done.")
+
+
+
 def main():
     start_ts = get_start_timestamp(minutes_back=15)
 
@@ -203,5 +213,20 @@ def main():
     print("LIFX color updated.")
 
 
+#python update_light_pa.py --color "#0000FF"    #blue
+python update_light_pa.py --color "#FF0000"    #red
+#python update_light_pa.py --color "#00FF00"    #green
+
+#python update_light_pa.py
+
+
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--color", type=str, help="Set a manual hex color (e.g., #00FF00)")
+    args = parser.parse_args()
+
+    if args.color:
+        test_set_color(args.color)
+    else:
+        main()
+
