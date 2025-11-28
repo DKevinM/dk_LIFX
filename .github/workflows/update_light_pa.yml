@@ -26,4 +26,4 @@ jobs:
           pip install requests
 
       - name: Run PurpleAir → LIFX update
-        run: python scripts/update_light_pa.py
+        run: python update_light_pa.py
