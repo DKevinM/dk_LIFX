@@ -1,33 +1,41 @@
-name: Update LIFX light from PurpleAir
+name: Update LIFX from PurpleAir
 
 on:
   schedule:
-    - cron: "*/30 * * * *"  # every 30 minutes
-  workflow_dispatch:        # allow manual run from Actions tab
+    - cron: "*/30 * * * *"   # every 30 minutes
+  workflow_dispatch:
+    inputs:
+      color:
+        description: "Manual hex color override (ex: #FF0000). Leave blank to use PurpleAir."
+        required: false
+        default: ""
 
 jobs:
   update-light:
     runs-on: ubuntu-latest
-    env:
-      PURPLEAIR_API_KEY: ${{ secrets.PURPLEAIR_API_KEY }}
-      LIFX_API_KEY: ${{ secrets.LIFX_API_KEY }}
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.12"
+          python-version: "3.11"
 
-      - name: Install dependencies
-      - name: Run update_light_pa.py
+      - name: Install Python dependencies
+        run: |
+          pip install requests
+
+      - name: Run script
+        env:
+          LIFX_API_KEY: ${{ secrets.LIFX_API_KEY }}
+          PURPLEAIR_API_KEY: ${{ secrets.PURPLEAIR_API_KEY }}
         run: |
           if [ -n "${{ github.event.inputs.color }}" ]; then
+            echo "Manual override color = ${{ github.event.inputs.color }}"
             python update_light_pa.py --color "${{ github.event.inputs.color }}"
           else
+            echo "Scheduled run: using PurpleAir data"
             python update_light_pa.py
           fi
-
-      - name: Run PurpleAir → LIFX update
-        run: python update_light_pa.py
