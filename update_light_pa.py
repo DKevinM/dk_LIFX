@@ -97,16 +97,6 @@ def fetch_purpleair_history(sensor_index: int, start_ts: int):
 
 
 def rh_correct_pm25(pm25_raw: float, rh: float) -> float:
-    """
-    Apply your RH correction logic from R.
-
-    if RH < 30:
-        denom = 1 + 0.24 / (100/30 - 1)
-    elif 30 <= RH < 70:
-        denom = 1 + 0.24 / (100/RH - 1)
-    else (RH >= 70):
-        denom = 1 + 0.24 / (100/70 - 1)
-    """
     # Handle missing RH: default to 50%
     if rh is None:
         rh = 50.0
