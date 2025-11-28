@@ -38,6 +38,29 @@ def get_start_timestamp(minutes_back: int = 15) -> int:
     return int(start_time.timestamp())
 
 
+"""
+pm_values = []
+for sensor_id in PURPLEAIR_SENSORS:
+    records = fetch_purpleair_history(sensor_id, start_ts)
+    if not records:
+        continue
+    records_sorted = sorted(records, key=lambda r: r["time_stamp"], reverse=True)
+    latest = records_sorted[0]
+    pm_raw = latest.get("pm2.5_atm")
+    rh = latest.get("humidity")
+    if pm_raw is not None:
+        pm_values.append(rh_correct_pm25(pm_raw, rh))
+
+if not pm_values:
+    print("No valid PM2.5 from any sensor; not changing light.")
+    return
+
+pm25_corr = sum(pm_values) / len(pm_values)
+color = get_pa_color(pm25_corr)
+"""
+
+
+
 def fetch_purpleair_history(sensor_index: int, start_ts: int):
     """
     Call PurpleAir history endpoint for a single sensor.
