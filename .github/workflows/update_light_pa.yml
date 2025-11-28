@@ -21,9 +21,13 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
+      - name: Run update_light_pa.py
         run: |
-          python -m pip install --upgrade pip
-          pip install requests
+          if [ -n "${{ github.event.inputs.color }}" ]; then
+            python update_light_pa.py --color "${{ github.event.inputs.color }}"
+          else
+            python update_light_pa.py
+          fi
 
       - name: Run PurpleAir → LIFX update
         run: python update_light_pa.py
