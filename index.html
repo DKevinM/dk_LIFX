@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>PurpleAir + LIFX Status Map</title>
+
+  <!-- Make it phone-friendly -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    .info-panel {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      max-width: 260px;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    }
+    .info-panel strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div class="info-panel" id="statusInfo">
+    <strong>PurpleAir + LIFX</strong>
+    <div id="statusText">Loading latest status…</div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <script>
+    // Path to your JSON file in the repo
+    const STATUS_JSON_URL = "data/purpleair_light_status.json";
+
+    // JS version of your get_pa_color() function
+    function getPaColor(pm25_corr) {
+      if (pm25_corr === null || pm25_corr === undefined) {
+        return "#D3D3D3"; // grey
+      }
+      const v = Number(pm25_corr);
+      if (Number.isNaN(v)) return "#D3D3D3";
+
+      if (v > 100) return "#640100";
+      else if (v > 90) return "#9a0100";
+      else if (v > 80) return "#cc0001";
+      else if (v > 70) return "#fe0002";
+      else if (v > 60) return "#fd6866";
+      else if (v > 50) return "#ff9835";
+      else if (v > 40) return "#ffcb00";
+      else if (v > 30) return "#fffe03";
+      else if (v > 20) return "#016797";
+      else if (v > 10) return "#0099cb";
+      else return "#01cbff";
+    }
+
+    // Basic Leaflet map setup
+    const map = L.map("map");
+
+    const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(map);
+
+    // Slightly zoomed-out default view over Alberta-ish
+    map.setView([53.5, -114.5], 7);
+
+    // Fetch JSON and draw markers
+    fetch(STATUS_JSON_URL)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch JSON: " + response.status);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        drawStatus(data);
+      })
+      .catch((err) => {
+        console.error(err);
+        document.getElementById("statusText").textContent =
+          "Error loading status JSON.";
+      });
+
+    function drawStatus(data) {
+      const sensors = data.sensors || [];
+      const light = data.light || {};
+      const usedIds = new Set(light.used_sensor_indices || []);
+
+      const statusTextEl = document.getElementById("statusText");
+
+      // Update info panel summary
+      let summary = "";
+      if (data.generated_at_utc) {
+        summary += "Updated: " + data.generated_at_utc + "<br/>";
+      }
+      if (light.strategy) {
+        summary += "Strategy: " + light.strategy + "<br/>";
+      }
+      if (typeof light.used_pm25_corr === "number") {
+        summary +=
+          "Avg PM₂.₅ (corr): " + light.used_pm25_corr.toFixed(1) + " µg/m³<br/>";
+      }
+      if (light.color_hex) {
+        summary +=
+          'LIFX color: <span style="display:inline-block;width:12px;height:12px;border:1px solid #000;vertical-align:middle;background:' +
+          light.color_hex +
+          '"></span> ' +
+          light.color_hex +
+          "<br/>";
+      }
+      if (!summary) summary = "Loaded status JSON, but no light info.";
+      statusTextEl.innerHTML = summary;
+
+      // Collect lat/lon bounds for auto-fit
+      const latlngs = [];
+
+      sensors.forEach((s) => {
+        const lat = s.latitude;
+        const lon = s.longitude;
+
+        if (lat === null || lat === undefined || lon === null || lon === undefined) {
+          return; // skip sensors without coordinates
+        }
+
+        const latNum = Number(lat);
+        const lonNum = Number(lon);
+        if (Number.isNaN(latNum) || Number.isNaN(lonNum)) {
+          return;
+        }
+
+        const isFresh = !!s.is_fresh;
+        const pmCorr = s.pm25_corr;
+        const markerColor = getPaColor(pmCorr);
+
+        const name = s.name || `Sensor ${s.sensor_index}`;
+        const usedInAvg = usedIds.has(s.sensor_index);
+
+        // Popup info
+        const parts = [];
+        parts.push("<strong>" + name + "</strong>");
+        parts.push("ID: " + s.sensor_index);
+        if (s.last_seen_iso_utc) {
+          parts.push("Last seen: " + s.last_seen_iso_utc);
+        }
+        if (typeof s.pm25_best === "number") {
+          parts.push("PM₂.₅ best: " + s.pm25_best.toFixed(1) + " µg/m³");
+        }
+        if (typeof pmCorr === "number") {
+          parts.push("PM₂.₅ corr: " + pmCorr.toFixed(1) + " µg/m³");
+        }
+        if (typeof s.humidity === "number") {
+          parts.push("RH: " + s.humidity.toFixed(0) + " %");
+        }
+        parts.push("Fresh: " + (isFresh ? "Yes" : "No"));
+        parts.push("Used in average: " + (usedInAvg ? "Yes" : "No"));
+
+        const popupHtml = parts.join("<br/>");
+
+        const radius = usedInAvg ? 10 : 7;
+
+        const marker = L.circleMarker([latNum, lonNum], {
+          radius: radius,
+          fillColor: markerColor,
+          color: "#000000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8,
+        }).addTo(map);
+
+        marker.bindPopup(popupHtml);
+        latlngs.push([latNum, lonNum]);
+      });
+
+      if (latlngs.length > 0) {
+        map.fitBounds(latlngs, { padding: [30, 30] });
+      }
+    }
+  </script>
+</body>
+</html>
