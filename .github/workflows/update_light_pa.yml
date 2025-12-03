@@ -31,6 +31,7 @@ jobs:
         env:
           LIFX_API_KEY: ${{ secrets.LIFX_API_KEY }}
           PURPLEAIR_API_KEY: ${{ secrets.PURPLEAIR_API_KEY }}
+          PA_SENSORS_CSV_URL: "https://raw.githubusercontent.com/DKevinM/AB_datapull/data/AB_PA_sensors.csv"         
         run: |
           if [ -n "${{ github.event.inputs.color }}" ]; then
             echo "Manual override color = ${{ github.event.inputs.color }}"
