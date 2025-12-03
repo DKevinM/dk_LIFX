@@ -2,6 +2,7 @@ import os
 import time
 import json
 import math
+import csv
 from datetime import datetime, timedelta, timezone
 
 import requests
@@ -133,6 +134,79 @@ def get_pa_color(pm25_corr: float) -> str:
         return "#0099cb"
     else:
         return "#01cbff"
+
+
+
+def _safe_float(x):
+    try:
+        if x is None:
+            return None
+        s = str(x).strip()
+        if not s:
+            return None
+        return float(s)
+    except (TypeError, ValueError):
+        return None
+
+
+
+def load_sensor_metadata(sensor_ids):
+    """
+    Load metadata (name, lat, lon, geometry) from a CSV hosted on GitHub.
+
+    Expects a CSV with at least:
+      sensor_index, name, latitude, longitude, geometry
+
+    Only returns rows whose sensor_index is in sensor_ids.
+    """
+    url = os.getenv("PA_SENSORS_CSV_URL")
+    if not url:
+        print("PA_SENSORS_CSV_URL not set; skipping metadata load.")
+        return {}
+
+    try:
+        resp = requests.get(url, timeout=20)
+        resp.raise_for_status()
+    except Exception as e:
+        print(f"Warning: could not fetch sensor metadata CSV: {e}")
+        return {}
+
+    lines = resp.text.splitlines()
+    reader = csv.DictReader(lines)
+
+    # Normalise sensor_ids to ints for matching
+    id_set = set()
+    for sid in sensor_ids:
+        try:
+            id_set.add(int(sid))
+        except (TypeError, ValueError):
+            pass
+
+    meta = {}
+    for row in reader:
+        raw_id = row.get("sensor_index") or row.get("SensorIndex") or row.get("id")
+        try:
+            sid = int(str(raw_id).strip())
+        except (TypeError, ValueError):
+            continue
+
+        if sid not in id_set:
+            continue
+
+        name = row.get("name") or row.get("Name")
+        lat = _safe_float(row.get("latitude") or row.get("lat") or row.get("Latitude"))
+        lon = _safe_float(row.get("longitude") or row.get("lon") or row.get("Longitude"))
+        geom = row.get("geometry") or row.get("wkt") or row.get("geom")
+
+        meta[sid] = {
+            "name": name,
+            "latitude": lat,
+            "longitude": lon,
+            "geometry": geom,
+        }
+
+    print(f"Loaded metadata for {len(meta)} sensors from CSV.")
+    return meta
 
 
 
@@ -316,6 +390,18 @@ def main():
     sensors_status = fetch_purpleair_current_multi(
         PURPLEAIR_SENSORS, max_age_minutes=MAX_AGE_MINUTES
     )
+    
+    # Merge in lat/lon/name/geometry from AB_PA_sensors.csv (if available)
+    sensor_ids_for_meta = [
+        s.get("sensor_index") for s in sensors_status if s.get("sensor_index") is not None
+    ]
+    meta_by_id = load_sensor_metadata(sensor_ids_for_meta)
+
+    for s in sensors_status:
+        sid = s.get("sensor_index")
+        if sid in meta_by_id:
+            s.update(meta_by_id[sid])
+
 
     if not PURPLEAIR_SENSORS:
         print("No PurpleAir sensors configured; not changing light.")
