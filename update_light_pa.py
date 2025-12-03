@@ -270,6 +270,7 @@ def build_status_payload(
     used_sensor_id,
     used_pm25_corr,
     used_color_hex,
+    strategy: str,
 ):
     """
     Build a JSON-serializable dict describing the current status.
@@ -283,7 +284,8 @@ def build_status_payload(
         "sensors": sensors_data,
         "light": {
             "lifx_device_id": LIFX_DEVICE_ID,
-            "used_sensor_index": used_sensor_id,
+            "strategy": strategy,  # e.g. "average_fresh_sensors"
+            "used_sensor_indices": used_sensor_indices,
             "used_pm25_corr": used_pm25_corr,
             "color_hex": used_color_hex,
             "duration_sec": LIFX_DURATION_SEC,
