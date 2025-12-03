@@ -39,3 +39,18 @@ jobs:
             echo "Scheduled run: using PurpleAir data"
             python update_light_pa.py
           fi
+
+      - name: Commit JSON to repo
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add data/purpleair_light_status.json
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Update PurpleAir light status JSON"
+            git push
+          fi
