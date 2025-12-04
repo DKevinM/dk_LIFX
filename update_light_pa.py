@@ -348,8 +348,9 @@ def build_status_payload(
 ):
     """
     Build a JSON-serializable dict describing the current status.
-
     sensors_data: list of dicts from fetch_purpleair_current_multi().
+    used_sensor_indices: list of sensor_index values that contributed to the light color
+    strategy: e.g. "average_fresh_sensors" or "none_available"
     """
     now_utc = datetime.now(timezone.utc).isoformat()
 
@@ -358,7 +359,7 @@ def build_status_payload(
         "sensors": sensors_data,
         "light": {
             "lifx_device_id": LIFX_DEVICE_ID,
-            "strategy": strategy,  # e.g. "average_fresh_sensors"
+            "strategy": strategy,
             "used_sensor_indices": used_sensor_indices,
             "used_pm25_corr": used_pm25_corr,
             "color_hex": used_color_hex,
@@ -405,51 +406,49 @@ def main():
 
     if not PURPLEAIR_SENSORS:
         print("No PurpleAir sensors configured; not changing light.")
-        return
-
-    # 2) Use FIRST sensor in the list to control the light (current behaviour)
-    used_sensor_id = PURPLEAIR_SENSORS[0]
-    used_sensor_info = next(
-        (s for s in sensors_status if s["sensor_index"] == used_sensor_id), None
-    )
-
-    if used_sensor_info is None:
-        print(f"Chosen sensor {used_sensor_id} not found in API response.")
         payload = build_status_payload(
-            sensors_status,
-            used_sensor_id=used_sensor_id,
+            sensors_data=sensors_status,
+            used_sensor_indices=[],
             used_pm25_corr=None,
             used_color_hex=None,
+            strategy="no_sensors_configured",
         )
         write_status_json(payload)
         return
 
-    pm25_best = used_sensor_info.get("pm25_best")
-    pm25_corr = used_sensor_info.get("pm25_corr")
-    rh = used_sensor_info.get("humidity")
-    is_fresh = used_sensor_info.get("is_fresh")
 
-    if not is_fresh or pm25_best is None or pm25_corr is None:
-        print(
-            f"Chosen sensor {used_sensor_id} has no fresh, valid PM data; "
-            "not changing light."
-        )
+    # 2) Select all fresh sensors with a valid corrected PM value
+    usable = [
+        s for s in sensors_status
+        if s.get("is_fresh") and s.get("pm25_corr") is not None
+    ]
+
+    if not usable:
+        print("No fresh valid PurpleAir data; not changing light.")
         payload = build_status_payload(
-            sensors_status,
-            used_sensor_id=used_sensor_id,
+            sensors_data=sensors_status,
+            used_sensor_indices=[],
             used_pm25_corr=None,
             used_color_hex=None,
+            strategy="none_available",
         )
         write_status_json(payload)
         return
 
-    color = get_pa_color(pm25_corr)
+    used_sensor_indices = [
+        int(s["sensor_index"]) for s in usable
+        if s.get("sensor_index") is not None
+    ]
+    pm_vals = [float(s["pm25_corr"]) for s in usable]
+    avg_pm25_corr = sum(pm_vals) / len(pm_vals)
+
+    color = get_pa_color(avg_pm25_corr)
 
     print(
-        f"Using sensor {used_sensor_id}: "
-        f"best_pm={pm25_best}, RH={rh}, "
-        f"corrected={pm25_corr:.2f}, color={color}, fresh={is_fresh}"
+        f"Using {len(usable)} sensors {used_sensor_indices}: "
+        f"avg_corrected={avg_pm25_corr:.2f}, color={color}"
     )
+  
 
     # 3) Set the LIFX bulb color
     set_lifx_color(color)
@@ -457,10 +456,11 @@ def main():
 
     # 4) Write status JSON for mapping / phone use
     payload = build_status_payload(
-        sensors_status,
-        used_sensor_id=used_sensor_id,
-        used_pm25_corr=pm25_corr,
+        sensors_data=sensors_status,
+        used_sensor_indices=used_sensor_indices,
+        used_pm25_corr=avg_pm25_corr,
         used_color_hex=color,
+        strategy="average_fresh_sensors",
     )
     write_status_json(payload)
 
