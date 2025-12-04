@@ -112,28 +112,30 @@ def get_pa_color(pm25_corr: float) -> str:
     except (TypeError, ValueError):
         return "#D3D3D3"  # grey for NA / invalid
 
-    if v > 90:
+    if v > 100:
         return "#640100"
-    elif v > 80:
+    elif v > 90:
         return "#9a0100"
-    elif v > 70:
+    elif v > 80:
         return "#cc0001"
-    elif v > 60:
+    elif v > 70:
         return "#fe0002"
-    elif v > 50:
+    elif v > 60:
         return "#fd6866"
-    elif v > 40:
+    elif v > 50:
         return "#ff9835"
-    elif v > 30:
+    elif v > 40:
         return "#ffcb00"
-    elif v > 20:
+    elif v > 30:
         return "#fffe03"
-    elif v > 10:
+    elif v > 20:
         return "#016797"
-    elif v > 0:
+    elif v > 10:
         return "#0099cb"
-    else:
+    elif v > 0:
         return "#01cbff"
+    else:
+        return "#D3D3D3"
 
 
 
