@@ -47,11 +47,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add data/purpleair_light_status.json
-
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
-            git commit -m "Update PurpleAir light status JSON"
+          # Only add/commit if the JSON actually changed
+          if git status --porcelain data/purpleair_light_status.json | grep .; then
+            git add data/purpleair_light_status.json
+            git commit -m "Update PurpleAir light status JSON [skip ci]"
             git push
+          else
+            echo "No changes to JSON; nothing to commit."
           fi
