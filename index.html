@@ -143,9 +143,9 @@
 
         this._div.innerHTML = `
           <div class="info-title">PurpleAir – Corrected PM2.5</div>
-          <div><span class="info-label">Generated (Edmonton):</span> ${generatedAtLocal}</div>
+          <div><span class="info-label">Generated:</span> ${generatedAtLocal}</div>
           <div class="info-main">
-            <span class="info-label">Average corrected PM₂.₅:</span>
+            <span class="info-label">Average corrected PM2.5:</span>
             ${typeof avgPm === "number" ? avgPm.toFixed(2) + " µg/m³" : "(n/a)"}
           </div>
           <div class="info-small">
@@ -203,7 +203,7 @@
           const lastSeenLocal = toEdmontonLocal(s.last_seen_iso_utc);
 
           const marker = L.circleMarker([lat, lon], {
-            radius: 7,
+            radius: 10,
             color: "#111827",
             weight: 1,
             fillColor: color,
@@ -213,7 +213,7 @@
           // Hover tooltip: name + corrected PM
           const tooltipHtml = `
             <div><strong>${name}</strong></div>
-            <div>Corrected PM₂.₅: ${
+            <div>Corrected PM2.5: ${
               pm == null ? "n/a" : pm.toFixed(2) + " µg/m³"
             }</div>
           `;
@@ -223,10 +223,10 @@
           const popupHtml = `
             <div><strong>${name}</strong></div>
             <div>Sensor ID: ${s.sensor_index ?? "(unknown)"}</div>
-            <div>Corrected PM₂.₅: ${
+            <div>Corrected PM2.5: ${
               pm == null ? "n/a" : pm.toFixed(2) + " µg/m³"
             }</div>
-            <div>Last seen (Edmonton): ${lastSeenLocal}</div>
+            <div>Last seen: ${lastSeenLocal}</div>
           `;
           marker.bindPopup(popupHtml);
 
