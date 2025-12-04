@@ -142,7 +142,13 @@
         if (!props) {
           this._div.innerHTML = `
             <div class="info-title">PurpleAir – Corrected PM2.5</div>
-            <div class="aqhi-color-box" style="background:#9CA3AF; margin-top:6px;"></div>
+            <div style="display:flex; align-items:center; margin-top:8px;">
+              <div class="aqhi-color-box"
+                   style="background:#9CA3AF; width:60px; height:40px;"></div>
+              <div style="margin-left:10px; font-size:14px;">
+                estimated AQHI: —
+              </div>
+            </div>
             <div>Loading latest data…</div>
           `;
           return;
@@ -152,21 +158,30 @@
       
         const hasAvg = typeof avgPm === "number";
         const boxColor = hasAvg ? pmToColor(avgPm) : "#9CA3AF";
+
+        // Estimated AQHI = PM2.5 corrected / 10
+        const estAQHI = hasAvg ? Math.round(avgPm / 10) : "—";
       
         this._div.innerHTML = `
           <div class="info-title">PurpleAir – Corrected PM2.5</div>
       
-          <div>
+          <!-- COLOR BOX + LABEL SIDE BY SIDE -->
+          <div style="display:flex; align-items:center; margin-top:8px;">
             <div class="aqhi-color-box"
-                 style="background:${boxColor}; width:40px; height:40px; margin:8px 0;">
+                 style="background:${boxColor}; width:60px; height:40px;">
+            </div>
+
+            <div style="margin-left:10px; font-size:15px; font-weight:600;">
+              estimated AQHI: ${estAQHI}
             </div>
           </div>
-      
-          <div class="info-label">Generated (Edmonton):</div>
+
+        
+          <div class="info-label" style="margin-top:10px;">Generated:</div>
           <div>${generatedAtLocal}</div>
       
-          <div class="info-label" style="margin-top:8px;">Average PM₂.₅ (corrected):</div>
-          <div>${hasAvg ? avgPm.toFixed(2) + " µg/m³" : "(n/a)"}</div>
+          <div class="info-label" style="margin-top:10px;">Average PM2.5 (corrected):</div>
+          <div>${hasAvg ? avgPm.toFixed(1) + " µg/m³" : "(n/a)"}</div>
       
           <div class="info-small" style="margin-top:6px;">
             ${nSensors} sensor${nSensors === 1 ? "" : "s"} averaged
