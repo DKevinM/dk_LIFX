@@ -82,18 +82,19 @@
 
     function pmToColor(v) {
       // Same breaks as your get_pa_color()
-      if (v == null || isNaN(v)) return "#D3D3D3";
-      if (v > 90) return "#640100";
-      if (v > 80)  return "#9a0100";
-      if (v > 70)  return "#cc0001";
-      if (v > 60)  return "#fe0002";
-      if (v > 50)  return "#fd6866";
-      if (v > 40)  return "#ff9835";
-      if (v > 30)  return "#ffcb00";
-      if (v > 20)  return "#fffe03";
-      if (v > 10)  return "#016797";
-      if (v > 0)  return "#0099cb";
-      return "#01cbff";
+      if (v == null || isNaN(v)) return "#D3D3D3";    
+      if (v > 100) return "#640100";
+      if (v > 90) return "#9a0100";
+      if (v > 80)  return "#cc0001";
+      if (v > 70)  return "#fe0002";
+      if (v > 60)  return "#fd6866";
+      if (v > 50)  return "#ff9835";
+      if (v > 40)  return "#ffcb00";
+      if (v > 30)  return "#fffe03";
+      if (v > 20)  return "#016797";
+      if (v > 10)  return "#0099cb";
+      if (v > 0)  return "#01cbff";
+      return "#D3D3D3";
     }
 
     function toEdmontonLocal(isoString) {
