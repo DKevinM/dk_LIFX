@@ -341,7 +341,7 @@ def manual_override():
 
 def build_status_payload(
     sensors_data,
-    used_sensor_id,
+    used_sensor_indices,
     used_pm25_corr,
     used_color_hex,
     strategy: str,
