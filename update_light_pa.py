@@ -21,7 +21,7 @@ LIFX_DEVICE_ID = "d073d568e6e8"
 LIFX_DURATION_SEC = 60
 
 # Output JSON file (for map / phone app)
-STATUS_JSON_PATH = "purpleair_light_status.json"
+STATUS_JSON_PATH = os.path.join("data", "purpleair_light_status.json")
 
 # Consider data "fresh" if last_seen is within this many minutes
 MAX_AGE_MINUTES = 30
@@ -375,6 +375,10 @@ def write_status_json(payload, path: str = STATUS_JSON_PATH):
     Write the status payload to a JSON file.
     """
     try:
+        # Ensure parent directory exists (e.g., data/)
+        dir_name = os.path.dirname(path)
+        if dir_name:
+            os.makedirs(dir_name, exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
             json.dump(payload, f, ensure_ascii=False, indent=2)
         print(f"Wrote status JSON to {path}")
