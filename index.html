@@ -160,8 +160,24 @@
         const hasAvg = typeof avgPm === "number";
         const boxColor = hasAvg ? pmToColor(avgPm) : "#9CA3AF";
 
-        // Estimated AQHI = PM2.5 corrected / 10
-        const estAQHI = hasAvg ? Math.round(avgPm / 10) : "—";
+
+        // Estimated AQHI = (PM2.5 corrected / 10) + 1
+        let estAQHI;
+        
+        if (!hasAvg || isNaN(avgPm)) {
+            estAQHI = "—";
+        } else {
+            let val = Math.round(avgPm / 10) + 1;
+        
+            // Cap at 10+
+            if (val > 10) {
+                estAQHI = "10+";
+            } else {
+                estAQHI = val;
+            }
+        }
+
+        
       
         this._div.innerHTML = `
           <div class="info-title">PurpleAir – Corrected PM2.5</div>
