@@ -59,6 +59,11 @@
       color: #9ca3af;
       margin-top: 0.25rem;
     }
+
+    .aqhi-color-box {
+      border-radius: 0.35rem;
+      border: 1px solid #020617;
+    }
     
   </style>
 </head>
@@ -110,6 +115,10 @@
       }
     }
 
+    
+
+    
+
     // --- Main --------------------------------------------------------
 
     async function initMap() {
@@ -130,29 +139,41 @@
       };
 
       info.update = function(props) {
-        // props: { generatedAtLocal, avgPm, nSensors }
         if (!props) {
           this._div.innerHTML = `
             <div class="info-title">PurpleAir – Corrected PM2.5</div>
+            <div class="aqhi-color-box" style="background:#9CA3AF; margin-top:6px;"></div>
             <div>Loading latest data…</div>
           `;
           return;
         }
-
+      
         const { generatedAtLocal, avgPm, nSensors } = props;
-
+      
+        const hasAvg = typeof avgPm === "number";
+        const boxColor = hasAvg ? pmToColor(avgPm) : "#9CA3AF";
+      
         this._div.innerHTML = `
           <div class="info-title">PurpleAir – Corrected PM2.5</div>
-          <div><span class="info-label">Generated:</span> ${generatedAtLocal}</div>
-          <div class="info-main">
-            <span class="info-label">Average corrected PM2.5:</span>
-            ${typeof avgPm === "number" ? avgPm.toFixed(2) + " µg/m³" : "(n/a)"}
+      
+          <div>
+            <div class="aqhi-color-box"
+                 style="background:${boxColor}; width:40px; height:40px; margin:8px 0;">
+            </div>
           </div>
-          <div class="info-small">
-            ${nSensors} sensor${nSensors === 1 ? "" : "s"} used in average
+      
+          <div class="info-label">Generated (Edmonton):</div>
+          <div>${generatedAtLocal}</div>
+      
+          <div class="info-label" style="margin-top:8px;">Average PM₂.₅ (corrected):</div>
+          <div>${hasAvg ? avgPm.toFixed(2) + " µg/m³" : "(n/a)"}</div>
+      
+          <div class="info-small" style="margin-top:6px;">
+            ${nSensors} sensor${nSensors === 1 ? "" : "s"} averaged
           </div>
         `;
       };
+
 
       info.addTo(map);
 
