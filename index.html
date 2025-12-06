@@ -167,7 +167,7 @@
         if (!hasAvg || isNaN(avgPm)) {
             estAQHI = "—";
         } else {
-            let val = Math.round(avgPm / 10) + 1;
+            let val = Math.floor(avgPm / 10) + 1;
         
             // Cap at 10+
             if (val > 10) {
