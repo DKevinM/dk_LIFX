@@ -157,31 +157,28 @@
         return this._div;
       };
 
+
       info.update = function(props) {
+      
+        // ---------- INITIAL / LOADING STATE ----------
         if (!props) {
           this._div.innerHTML = `
             <div class="info-title">PurpleAir – Corrected PM2.5</div>
-          
+      
             <div style="display:flex; align-items:center; margin-top:8px;">
               <div class="aqhi-color-box"
-                   style="background:${boxColor}; width:60px; height:40px;">
+                   style="background:#9CA3AF; width:60px; height:40px;">
               </div>
-          
+      
               <div style="margin-left:10px; font-size:15px; font-weight:600;">
-                estimated AQHI: ${estAQHI}
+                estimated AQHI: —
               </div>
             </div>
-          
-            <div class="info-label" style="margin-top:10px;">Generated:</div>
-            <div>${generatedAtLocal}</div>
-          
-            <div class="info-label" style="margin-top:10px;">Average PM2.5 (corrected):</div>
-            <div>${hasAvg ? avgPm.toFixed(1) + " µg/m³" : "(n/a)"}</div>
-          
-            <div class="info-small" style="margin-top:6px;">
-              ${nSensors} sensor${nSensors === 1 ? "" : "s"} averaged
+      
+            <div class="info-small" style="margin-top:10px;">
+              Loading latest data…
             </div>
-          
+      
             <div class="resource-links">
               <div class="info-label">External Resources</div>
               <a href="https://firesmoke.ca/forecasts/current/" target="_blank">
@@ -192,49 +189,34 @@
               </a>
             </div>
           `;
-
           return;
         }
       
+        // ---------- DATA AVAILABLE ----------
         const { generatedAtLocal, avgPm, nSensors } = props;
       
         const hasAvg = typeof avgPm === "number";
         const boxColor = hasAvg ? pmToColor(avgPm) : "#9CA3AF";
-
-
-        // Estimated AQHI = (PM2.5 corrected / 10) + 1
-        let estAQHI;
-        
-        if (!hasAvg || isNaN(avgPm)) {
-            estAQHI = "—";
-        } else {
-            let val = Math.floor(avgPm / 10) + 1;
-        
-            // Cap at 10+
-            if (val > 10) {
-                estAQHI = "10+";
-            } else {
-                estAQHI = val;
-            }
+      
+        let estAQHI = "—";
+        if (hasAvg && !isNaN(avgPm)) {
+          let val = Math.floor(avgPm / 10) + 1;
+          estAQHI = val > 10 ? "10+" : val;
         }
-
-        
       
         this._div.innerHTML = `
           <div class="info-title">PurpleAir – Corrected PM2.5</div>
       
-          <!-- COLOR BOX + LABEL SIDE BY SIDE -->
           <div style="display:flex; align-items:center; margin-top:8px;">
             <div class="aqhi-color-box"
                  style="background:${boxColor}; width:60px; height:40px;">
             </div>
-
+      
             <div style="margin-left:10px; font-size:15px; font-weight:600;">
               estimated AQHI: ${estAQHI}
             </div>
           </div>
-
-        
+      
           <div class="info-label" style="margin-top:10px;">Generated:</div>
           <div>${generatedAtLocal}</div>
       
@@ -244,8 +226,19 @@
           <div class="info-small" style="margin-top:6px;">
             ${nSensors} sensor${nSensors === 1 ? "" : "s"} averaged
           </div>
+      
+          <div class="resource-links">
+            <div class="info-label">External Resources</div>
+            <a href="https://firesmoke.ca/forecasts/current/" target="_blank">
+              FireSmoke Canada – Current Forecast
+            </a>
+            <a href="https://eer.cmc.ec.gc.ca/mandats/AutoSim/ops/Fire_CA_HRDPS_CWFIS/latest/Canada/latest/img/Canada/anim.html" target="_blank">
+              ECCC Fire & Smoke HRDPS Animation
+            </a>
+          </div>
         `;
       };
+      
 
 
       info.addTo(map);
