@@ -64,6 +64,24 @@
       border-radius: 0.35rem;
       border: 1px solid #020617;
     }
+
+    .resource-links {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(148,163,184,0.25);
+    }
+    
+    .resource-links a {
+      display: block;
+      color: #93c5fd;
+      text-decoration: none;
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+    
+    .resource-links a:hover {
+      text-decoration: underline;
+    }
     
   </style>
 </head>
@@ -143,15 +161,38 @@
         if (!props) {
           this._div.innerHTML = `
             <div class="info-title">PurpleAir – Corrected PM2.5</div>
+          
             <div style="display:flex; align-items:center; margin-top:8px;">
               <div class="aqhi-color-box"
-                   style="background:#9CA3AF; width:60px; height:40px;"></div>
-              <div style="margin-left:10px; font-size:14px;">
-                estimated AQHI: —
+                   style="background:${boxColor}; width:60px; height:40px;">
+              </div>
+          
+              <div style="margin-left:10px; font-size:15px; font-weight:600;">
+                estimated AQHI: ${estAQHI}
               </div>
             </div>
-            <div>Loading latest data…</div>
+          
+            <div class="info-label" style="margin-top:10px;">Generated:</div>
+            <div>${generatedAtLocal}</div>
+          
+            <div class="info-label" style="margin-top:10px;">Average PM2.5 (corrected):</div>
+            <div>${hasAvg ? avgPm.toFixed(1) + " µg/m³" : "(n/a)"}</div>
+          
+            <div class="info-small" style="margin-top:6px;">
+              ${nSensors} sensor${nSensors === 1 ? "" : "s"} averaged
+            </div>
+          
+            <div class="resource-links">
+              <div class="info-label">External Resources</div>
+              <a href="https://firesmoke.ca/forecasts/current/" target="_blank">
+                FireSmoke Canada – Current Forecast
+              </a>
+              <a href="https://eer.cmc.ec.gc.ca/mandats/AutoSim/ops/Fire_CA_HRDPS_CWFIS/latest/Canada/latest/img/Canada/anim.html" target="_blank">
+                ECCC Fire & Smoke HRDPS Animation
+              </a>
+            </div>
           `;
+
           return;
         }
       
