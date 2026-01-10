@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-01-10T17:35:07.818101+00:00",
+  "generated_at_utc": "2026-01-10T18:04:27.868377+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
@@ -19,14 +19,14 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1768066450,
-      "last_seen_iso_utc": "2026-01-10T17:34:10+00:00",
-      "humidity": 48,
-      "pm25_atm": 3.8,
-      "pm25_atm_a": 3.7,
-      "pm25_atm_b": 3.9,
-      "pm25_best": 3.8,
-      "pm25_corr": 3.110831234256927,
+      "last_seen": 1768068250,
+      "last_seen_iso_utc": "2026-01-10T18:04:10+00:00",
+      "humidity": 47,
+      "pm25_atm": 4.5,
+      "pm25_atm_a": 4.6,
+      "pm25_atm_b": 4.4,
+      "pm25_best": 4.5,
+      "pm25_corr": 3.7103298070939643,
       "is_fresh": true,
       "name": "WCAS_Entwistle1(AQSU-6463)",
       "latitude": 53.593525,
@@ -35,14 +35,14 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1768066452,
-      "last_seen_iso_utc": "2026-01-10T17:34:12+00:00",
+      "last_seen": 1768068252,
+      "last_seen_iso_utc": "2026-01-10T18:04:12+00:00",
       "humidity": 55,
-      "pm25_atm": 9.1,
-      "pm25_atm_a": 7.8,
-      "pm25_atm_b": 10.3,
-      "pm25_best": 9.1,
-      "pm25_corr": 7.036082474226803,
+      "pm25_atm": 11.2,
+      "pm25_atm_a": 8.2,
+      "pm25_atm_b": 14.3,
+      "pm25_best": 11.2,
+      "pm25_corr": 8.65979381443299,
       "is_fresh": true,
       "name": "WCAS_Evansburg1 (AQSU-A26A)",
       "latitude": 53.60466,
@@ -57,7 +57,7 @@
       91545,
       166965
     ],
-    "used_pm25_corr": 5.073456854241865,
+    "used_pm25_corr": 6.185061810763477,
     "color_hex": "#01cbff",
     "duration_sec": 60
   }
