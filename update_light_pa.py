@@ -13,7 +13,7 @@ import argparse
 
 # PurpleAir sensor IDs – you can later put multiple here and average
 # PURPLEAIR_SENSORS = [123421]  # Spruce Grove / Mom's sensor test case
-PURPLEAIR_SENSORS = [166965,83971,91545]  # Evansburg / Entwistle
+PURPLEAIR_SENSORS = [166965,83971,91545,249949]  # Evansburg / Entwistle
 # LIFX device ID (serial)
 LIFX_DEVICE_ID = "d073d568e6e8"
 
