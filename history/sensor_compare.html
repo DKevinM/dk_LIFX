@@ -1,0 +1,435 @@
+<!-- sensor_compare.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sensor Compare – PM₂.₅</title>
+
+  <!-- Plotly -->
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
+
+  <!-- Choices.js for multi-select UI -->
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h2 { margin-top: 0; }
+    select {
+      margin-bottom: 10px;
+    }
+    label { margin-right: 12px; }
+    #controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    #plot {
+      width: 100%;
+      height: 600px;
+      margin-top: 20px;
+    }
+    .notice {
+      background: #fff3cd;
+      border: 1px solid #f9d9a7;
+      color: #5c3d00;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin: 0 0 16px 0;
+      font-weight: 600;
+    }
+    button {
+      margin-right: 6px;
+      margin-top: 4px;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    /* HARD LOCK wrapper */
+    .choices-wrapper {
+      width: 750px;
+      min-width: 750px;
+      max-width: 750px;
+    }
+    
+    /* Force Choices to obey wrapper */
+    .choices-wrapper .choices {
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
+    }
+    
+    /* Prevent inner collapse */
+    .choices-wrapper .choices__inner {
+      display: block !important;
+      width: 100% !important;
+    }
+    
+    .back-link {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #0645ad;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: underline;
+    }
+    .back-link:hover {
+      color: #0b0080;
+    }    
+  </style>
+</head>
+<body>
+  <button id="closeBtn" style="margin-bottom:12px;">← Back to AQHI Map</button>
+  
+  <div class="notice">
+    PurpleAir Sensor Data – corrected PM2.5 (corrected data shown)
+  </div>
+
+  <h2>Sensor Compare (PM2.5 corrected)</h2>
+
+  <div id="controls">
+    <div>
+      <h3>Select Sensors</h3>
+      <div class="choices-wrapper">
+        <select id="sensorDropdown" multiple></select>
+      </div>
+
+
+      <!-- NEW: Quick-select group controls -->
+      <div>
+        <button type="button" id="clearSensorsBtn">Clear selection</button>
+      </div>
+    </div>
+
+    <div>
+      <h3>Select Date Range</h3>
+      <label>
+        Start Date:
+        <input type="date" id="startDate" />
+      </label>
+      <label>
+        End Date:
+        <input type="date" id="endDate" />
+      </label>
+    </div>
+  </div>
+
+  <div id="plot"></div>
+
+  <script type="module">
+   
+    document.getElementById("closeBtn").addEventListener("click", () => {
+      // Try to close the window (works when opened via target=_blank)
+      window.close();
+    
+      // Fallback if close is blocked
+      setTimeout(() => {
+        window.history.back();
+      }, 100);
+    });
+
+    
+    function getQueryParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+    
+    // -----------------------------
+    // 1. DOM elements
+    // -----------------------------
+    const sensorDropdown   = document.getElementById("sensorDropdown");
+    const startEl          = document.getElementById("startDate");
+    const endEl            = document.getElementById("endDate");
+    const clearSensorsBtn  = document.getElementById("clearSensorsBtn");
+
+    // Keep reference to all sensors + Choices instance
+    let allSensors = [];
+    let sensorChoices = null;
+  
+
+
+    // -----------------------------
+    // 2. Supabase client
+    // -----------------------------
+    const SUPABASE_URL = "https://zcunoncbyitfsilrhymv.supabase.co";
+    const SUPABASE_ANON_KEY =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjdW5vbmNieWl0ZnNpbHJoeW12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3Mjk3NDYsImV4cCI6MjA2NzMwNTc0Nn0._z_tqm_5UIBkWfMa7HAJrUOA-0t9vOaBVV48-74esWQ";
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // -----------------------------
+    // 3. Helpers
+    // -----------------------------
+    function setDefaultDates(daysBack = 7) {
+      const now = new Date();
+      const start = new Date(now);
+      start.setDate(start.getDate() - daysBack);
+
+      startEl.valueAsDate = start;
+      endEl.valueAsDate   = now;
+    }
+
+    function toEdmontonString(ts) {
+      return new Date(ts).toLocaleString("en-CA", {
+        timeZone: "America/Edmonton",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+      });
+    }
+
+    // -----------------------------
+    // 4. Load sensor list
+    // -----------------------------
+    async function loadSensors() {
+      console.log("Loading sensors from purpleair_sensors…");
+
+      const params = new URLSearchParams(window.location.search);
+      const historySensor = params.get("sensor_index");
+      
+      if (!historySensor) return;      
+    
+      const { data, error } = await supabase
+        .from("purpleair_sensors") 
+        .select("sensor_index, name, network")
+        .eq("sensor_index", historySensor)   // 🔥 filter to one sensor
+        .limit(1);
+      
+      if (error) {
+        console.error("purpleair_sensors error:", error);
+        return;
+      }
+    
+      // Store as a simple array
+      allSensors = data.map(row => ({
+        index: row.sensor_index,
+        name: row.name,
+        network: row.network
+      }));
+    
+      console.log("Unique sensors:", allSensors.length);
+    
+      // Populate dropdown
+      allSensors.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = String(s.index);
+        opt.textContent = s.name
+          ? `${s.name} (#${s.index})`
+          : `Sensor #${s.index}`;
+        sensorDropdown.appendChild(opt);
+      });
+    
+      sensorChoices = new Choices(sensorDropdown, {
+        removeItemButton: true,
+        searchPlaceholderValue: "Type to search sensors…"
+      });
+     
+
+      // ----------------------------------
+      // URL-driven selection (wins)
+      // ----------------------------------
+      const sensorFromURL = getQueryParam("sensor_index");
+      
+      if (sensorFromURL) {
+        sensorChoices.removeActiveItems();
+        sensorChoices.setChoiceByValue([String(sensorFromURL)]);
+      
+        if (sensorDropdown.selectedOptions.length > 0) {
+          fetchAndPlot();
+        } else {
+          Plotly.newPlot("plot", [], {
+            title: `Sensor ${sensorFromURL} not found`
+          });
+        }
+      } else {
+        Plotly.newPlot("plot", [], {
+          title: "Click a PurpleAir sensor on the map to view historical data"
+        });
+      }
+      
+      // Initial plot
+      fetchAndPlot();
+    }
+
+
+    // -----------------------------
+    // 5. Fetch & plot time series
+    // -----------------------------
+    async function fetchAndPlot() {
+      try {
+        const selectedSensors = Array.from(sensorDropdown.selectedOptions)
+          .map(opt => Number(opt.value))
+          .filter(v => Number.isFinite(v));
+
+        if (selectedSensors.length === 0) {
+          console.log("No sensors selected; clearing plot.");
+          Plotly.newPlot("plot", [], {
+            title: "Click a PurpleAir sensor on the map to view historical data",
+            xaxis: { title: "Time", type: "date" },
+            yaxis: { title: "PM₂.₅ corrected (µg/m³)" }
+          });
+          return;
+        }
+
+        const start = new Date(startEl.value);
+        const end   = new Date(startEl.value ? endEl.value : "");
+
+        if (!startEl.value || !endEl.value || isNaN(start) || isNaN(end)) {
+          console.warn("Invalid date range");
+          return;
+        }
+
+        // Make end inclusive by adding 1 day and using < endExclusive
+        const endExclusive = new Date(end);
+        endExclusive.setDate(endExclusive.getDate() + 1);
+
+        const startISO = start.toISOString();
+        const endISO   = endExclusive.toISOString();
+
+        const traces = [];
+
+        for (const sensorIndex of selectedSensors) {
+          console.log(`Querying sensor_readings for sensor_index=${sensorIndex}`);
+          const { data, error } = await supabase
+            .from("sensor_readings")
+            // ONLY corrected PM now
+            .select("sensor_index, name, recorded_at, pm_corrected")
+            .eq("sensor_index", sensorIndex)
+            .gte("recorded_at", startISO)
+            .lt("recorded_at", endISO)
+            .order("recorded_at", { ascending: true });
+
+          if (error) {
+            console.error(`Query error for sensor ${sensorIndex}:`, error);
+            continue;
+          }
+          if (!data || data.length === 0) {
+            console.warn(`No data for sensor ${sensorIndex} in range`);
+            continue;
+          }
+
+          const name  = data[0].name || "";
+          const label = name
+            ? `${name} (#${sensorIndex})`
+            : `Sensor #${sensorIndex}`;
+
+          const x = [];
+          const y = [];
+          const text = [];
+
+          data.forEach(row => {
+            const pmCorr = row.pm_corrected != null ? Number(row.pm_corrected) : null;
+            if (pmCorr == null || isNaN(pmCorr)) return;
+
+            const ts = new Date(row.recorded_at);
+            x.push(ts);
+            y.push(pmCorr);
+
+            const local = toEdmontonString(row.recorded_at);
+
+            text.push(
+              `${label}<br>` +
+              `PM₂.₅ (corrected): ${pmCorr.toFixed(1)} µg/m³<br>` +
+              `Time: ${local}`
+            );
+          });
+
+          if (x.length === 0) {
+            console.warn(`All corrected values NaN for sensor ${sensorIndex}`);
+            continue;
+          }
+
+          traces.push({
+            x,
+            y,
+            mode: "lines+markers",
+            name: label,
+            text,
+            hovertemplate: "%{text}<extra></extra>"
+          });
+        }
+
+        if (traces.length === 0) {
+          Plotly.newPlot("plot", [], {
+            title: "No data for selected sensors in this date range",
+            xaxis: { title: "Time", type: "date" },
+            yaxis: { title: "PM₂.₅ corrected (µg/m³)" }
+          });
+          return;
+        }
+
+        const layout = {
+          title: "PurpleAir Sensors – PM₂.₅ (corrected)",
+          xaxis: { title: "Time", type: "date" },
+          yaxis: { title: "PM₂.₅ corrected (µg/m³)" },
+          margin: { t: 120 },
+          hovermode: "x unified",
+          legend: {
+            orientation: "h",
+            xanchor: "center",
+            x: 0.5,
+            yanchor: "top",
+            y: -0.2,          // negative puts it under the x-axis
+            font: { size: 9 },
+            itemwidth: 60
+          }
+      //    annotations: [
+      //      {
+      //        text: "PurpleAir – corrected",
+      //        xref: "paper",
+      //        yref: "paper",
+      //        x: 0,
+      //        y: 1.18,
+      //        showarrow: false,
+      //        font: { size: 14, color: "#b00020" },
+      //        align: "left"
+      //      }
+      //    ]
+        };
+
+        Plotly.newPlot("plot", traces, layout);
+      } catch (err) {
+        console.error("fetchAndPlot failed:", err);
+      }
+    }
+   
+
+    function clearSensorSelection() {
+      if (!sensorChoices) return;
+      sensorChoices.removeActiveItems();
+      fetchAndPlot();
+    }
+
+
+    // -----------------------------
+    // 7. Init
+    // -----------------------------
+    const hasSensorParam = !!getQueryParam("sensor_index");
+    if (hasSensorParam) {
+      setDefaultDates(7);
+    }
+
+
+    startEl.addEventListener("change", fetchAndPlot);
+    endEl.addEventListener("change", fetchAndPlot);
+    sensorDropdown.addEventListener("change", fetchAndPlot);
+    clearSensorsBtn.addEventListener("click", clearSensorSelection);
+
+    await loadSensors();
+  </script>
+</body>
+</html>
