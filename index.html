@@ -298,15 +298,6 @@
           });
 
           // Hover tooltip: name + corrected PM
-          const tooltipHtml = `
-            <div><strong>${name}</strong></div>
-            <div>Corrected PM2.5: ${
-              pm == null ? "n/a" : pm.toFixed(2) + " µg/m³"
-            }</div>
-          `;
-          marker.bindTooltip(tooltipHtml, { direction: "top" });
-
-          // Click popup: more detail, still clean
           const popupHtml = `
             <div><strong>${name}</strong></div>
             <div>Sensor ID: ${s.sensor_index ?? "(unknown)"}</div>
@@ -314,7 +305,16 @@
               pm == null ? "n/a" : pm.toFixed(2) + " µg/m³"
             }</div>
             <div>Last seen: ${lastSeenLocal}</div>
+          
+            <hr style="margin:6px 0">
+          
+            <a href="/AQHI.forecast/history/sensor_compare.html?sensor_index=${s.sensor_index}"
+               target="_blank"
+               style="color:#60a5fa; text-decoration:none; font-size:0.8rem;">
+               Click here for sensor history
+            </a>
           `;
+
           marker.bindPopup(popupHtml);
 
           marker.addTo(map);
