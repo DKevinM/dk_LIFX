@@ -1,11 +1,11 @@
 {
-  "generated_at_utc": "2026-02-08T22:05:22.347896+00:00",
+  "generated_at_utc": "2026-02-08T22:42:26.469561+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1770588227,
-      "last_seen_iso_utc": "2026-02-08T22:03:47+00:00",
-      "humidity": 30,
+      "last_seen": 1770590508,
+      "last_seen_iso_utc": "2026-02-08T22:41:48+00:00",
+      "humidity": 28,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -19,9 +19,9 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1770588245,
-      "last_seen_iso_utc": "2026-02-08T22:04:05+00:00",
-      "humidity": 28,
+      "last_seen": 1770590405,
+      "last_seen_iso_utc": "2026-02-08T22:40:05+00:00",
+      "humidity": 27,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -35,14 +35,14 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1770588177,
-      "last_seen_iso_utc": "2026-02-08T22:02:57+00:00",
-      "humidity": 29,
-      "pm25_atm": 0.0,
-      "pm25_atm_a": 0.1,
-      "pm25_atm_b": 0.0,
-      "pm25_best": 0.0,
-      "pm25_corr": 0.0,
+      "last_seen": 1770590457,
+      "last_seen_iso_utc": "2026-02-08T22:40:57+00:00",
+      "humidity": 28,
+      "pm25_atm": 0.2,
+      "pm25_atm_a": 0.2,
+      "pm25_atm_b": 0.2,
+      "pm25_best": 0.2,
+      "pm25_corr": 0.1813471502590674,
       "is_fresh": true,
       "name": "WCAS_Evansburg1 (AQSU-A26A)",
       "latitude": 53.60466,
@@ -51,9 +51,9 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1770588194,
-      "last_seen_iso_utc": "2026-02-08T22:03:14+00:00",
-      "humidity": 28,
+      "last_seen": 1770590479,
+      "last_seen_iso_utc": "2026-02-08T22:41:19+00:00",
+      "humidity": 27,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -75,8 +75,8 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 0.0,
-    "color_hex": "#D3D3D3",
+    "used_pm25_corr": 0.04533678756476685,
+    "color_hex": "#01cbff",
     "duration_sec": 60
   }
 }
