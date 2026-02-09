@@ -1,11 +1,11 @@
 {
-  "generated_at_utc": "2026-02-09T00:18:18.429776+00:00",
+  "generated_at_utc": "2026-02-09T00:56:12.829861+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1770596269,
-      "last_seen_iso_utc": "2026-02-09T00:17:49+00:00",
-      "humidity": 29,
+      "last_seen": 1770598429,
+      "last_seen_iso_utc": "2026-02-09T00:53:49+00:00",
+      "humidity": 30,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -19,9 +19,9 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1770596167,
-      "last_seen_iso_utc": "2026-02-09T00:16:07+00:00",
-      "humidity": 27,
+      "last_seen": 1770598450,
+      "last_seen_iso_utc": "2026-02-09T00:54:10+00:00",
+      "humidity": 29,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -35,14 +35,14 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1770596218,
-      "last_seen_iso_utc": "2026-02-09T00:16:58+00:00",
-      "humidity": 28,
-      "pm25_atm": 0.0,
-      "pm25_atm_a": 0.0,
+      "last_seen": 1770598499,
+      "last_seen_iso_utc": "2026-02-09T00:54:59+00:00",
+      "humidity": 30,
+      "pm25_atm": 0.1,
+      "pm25_atm_a": 0.1,
       "pm25_atm_b": 0.0,
-      "pm25_best": 0.0,
-      "pm25_corr": 0.0,
+      "pm25_best": 0.1,
+      "pm25_corr": 0.0906735751295337,
       "is_fresh": true,
       "name": "WCAS_Evansburg1 (AQSU-A26A)",
       "latitude": 53.60466,
@@ -51,9 +51,9 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1770596225,
-      "last_seen_iso_utc": "2026-02-09T00:17:05+00:00",
-      "humidity": 28,
+      "last_seen": 1770598516,
+      "last_seen_iso_utc": "2026-02-09T00:55:16+00:00",
+      "humidity": 32,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -75,8 +75,8 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 0.0,
-    "color_hex": "#D3D3D3",
+    "used_pm25_corr": 0.022668393782383424,
+    "color_hex": "#01cbff",
     "duration_sec": 60
   }
 }
