@@ -29,6 +29,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install requests
+          pip install pandas
 
       - name: Run script
         env:
