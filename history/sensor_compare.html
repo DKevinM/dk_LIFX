@@ -196,16 +196,20 @@
     // 4. Load sensor list
     // -----------------------------
     async function loadSensors() {
-      console.log("Loading sensors from purpleair_sensors…");
-
-      
+      console.log("A) loadSensors() entered");
+    
       const SENSOR_IDS = [166965, 249949, 83971, 91545];
-      
+      console.log("B) SENSOR_IDS =", SENSOR_IDS);
+    
+      console.log("C) about to call supabase .from(purpleair_sensors) ...");
       const { data, error } = await supabase
         .from("purpleair_sensors")
         .select("sensor_index, name, network")
         .in("sensor_index", SENSOR_IDS);
-
+    
+      console.log("D) supabase returned (this should always print)");
+      console.log("E) error =", error);
+      console.log("F) data len =", data?.length);
       
       if (error) {
         console.error("purpleair_sensors error:", error);
