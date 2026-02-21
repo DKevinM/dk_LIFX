@@ -199,7 +199,7 @@
     async function loadSensors() {
       console.log("A) loadSensors() entered");
     
-      const SENSOR_IDS = ["166965", "249949", "83971", "91545"];
+      const SENSOR_IDS = [166965, 249949, 83971, 91545];
       console.log("B) SENSOR_IDS =", SENSOR_IDS);
     
       console.log("C) about to call supabase .from(purpleair_sensors) ...");
@@ -411,7 +411,7 @@
     sensorDropdown.addEventListener("change", fetchAndPlot);
     clearSensorsBtn.addEventListener("click", clearSensorSelection);
 
-    await loadSensors();
+    loadSensors();
   </script>
 </body>
 </html>
