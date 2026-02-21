@@ -7,6 +7,7 @@ from datetime import datetime, timedelta, timezone
 
 import requests
 import argparse
+import pandas as pd
 
 
 # === CONFIG YOU CAN SAFELY COMMIT (no secrets) ====================
@@ -40,6 +41,37 @@ if not LIFX_API_KEY:
 
 # ---------- PurpleAir helper logic --------------------------------
 
+def choose_pm_and_method(a, b, avg, forced=None):
+    # forced can be "A", "B", "OFF", or None
+    if forced == "OFF":
+        return None, "off"
+    if forced == "A":
+        return a, "forced_A"
+    if forced == "B":
+        return b, "forced_B"
+
+    # hard invalids
+    if _is_na(a) and not _is_na(b) and b <= 2000:
+        return b, "b_only"
+    if _is_na(b) and not _is_na(a) and a <= 2000:
+        return a, "a_only"
+    if not _is_na(a) and a > 2000 and not _is_na(b) and b <= 2000:
+        return b, "b_only_a_spike"
+    if not _is_na(b) and b > 2000 and not _is_na(a) and a <= 2000:
+        return a, "a_only_b_spike"
+
+    if not _is_na(a) and not _is_na(b):
+        diff = abs(a - b)
+        if diff > 500:
+            return None, "extreme_diff_reject"
+        if diff > 50:
+            return min(a, b), "min_ab"
+        if not _is_na(avg) and avg >= 0:
+            return avg, "avg"
+
+    return avg, "fallback_avg"
+
+
 def _is_na(x):
     """Minimal 'is.na' equivalent without pandas."""
     if x is None:
@@ -49,36 +81,16 @@ def _is_na(x):
     return False
 
 
-# Robust PM2.5 calculation (R logic ported) - ADD THESE FUNCTIONS
-def get_best_pm(a, b, avg):
-    """
-    Robust PM2.5 calculation (R logic ported).
+def load_channel_override_local(path="data/channel_override.csv"):
+    try:
+        df = pd.read_csv(path)
+        df["sensor_index"] = df["sensor_index"].astype(int)
+        return dict(zip(df["sensor_index"], df["force_channel"]))
+    except Exception:
+        return {}
 
-    a   = pm2.5_atm_a
-    b   = pm2.5_atm_b
-    avg = pm2.5_atm (PurpleAir's own average)
-    """
-    # Handle extreme / missing cases
-    if _is_na(a) and not _is_na(b) and b <= 2000:
-        return b
-    if _is_na(b) and not _is_na(a) and a <= 2000:
-        return a
-    if not _is_na(a) and a > 2000 and not _is_na(b) and b <= 2000:
-        return b
-    if not _is_na(b) and b > 2000 and not _is_na(a) and a <= 2000:
-        return a
 
-    if not _is_na(a) and not _is_na(b):
-        diff = abs(a - b)
-        if diff > 50 and diff <= 500:
-            return max(a, b)
-        elif diff > 500:
-            return None
-        elif diff <= 50 and not _is_na(avg) and avg >= 0:
-            return avg
 
-    # Fallback
-    return avg
 
 
 
@@ -201,7 +213,7 @@ def load_sensor_metadata(sensor_ids):
 
 
 
-def fetch_purpleair_current_multi(sensor_ids, max_age_minutes=30):
+def fetch_purpleair_current_multi(sensor_ids, overrides, max_age_minutes=30):
     """
     Call PurpleAir /v1/sensors once for all sensor_ids using show_only.
 
@@ -219,6 +231,7 @@ def fetch_purpleair_current_multi(sensor_ids, max_age_minutes=30):
         "is_fresh": bool
       }
     """
+    
     if not sensor_ids:
         return []
 
@@ -262,14 +275,23 @@ def fetch_purpleair_current_multi(sensor_ids, max_age_minutes=30):
             ts_iso = None
 
         # Robust PM selection
-        best_pm = get_best_pm(pm_a, pm_b, pm_atm)
+        # Optional channel override support
+        
+        forced = overrides.get(int(sid)) if sid is not None else None
+        
+        best_pm, pm_method = choose_pm_and_method(
+            pm_a,
+            pm_b,
+            pm_atm,
+            forced=forced
+        )
 
         # RH correction only if data is fresh and best_pm is valid
         if is_fresh and best_pm is not None and not _is_na(best_pm):
             pm_corr = rh_correct_pm25(best_pm, rh)
         else:
             pm_corr = None
-
+        
         results.append(
             {
                 "sensor_index": sid,
@@ -281,6 +303,7 @@ def fetch_purpleair_current_multi(sensor_ids, max_age_minutes=30):
                 "pm25_atm_b": pm_b,
                 "pm25_best": best_pm,
                 "pm25_corr": pm_corr,
+                "pm_method": pm_method,
                 "is_fresh": is_fresh,
             }
         )
@@ -382,10 +405,14 @@ def write_status_json(payload, path: str = STATUS_JSON_PATH):
 
 def main():
     # 1) Fetch data for all configured sensors via /v1/sensors + show_only
-    sensors_status = fetch_purpleair_current_multi(
-        PURPLEAIR_SENSORS, max_age_minutes=MAX_AGE_MINUTES
-    )
+    overrides = load_channel_override_local()
     
+    sensors_status = fetch_purpleair_current_multi(
+        PURPLEAIR_SENSORS,
+        overrides,
+        max_age_minutes=MAX_AGE_MINUTES
+    )
+
     # Merge in lat/lon/name/geometry from AB_PA_sensors.csv (if available)
     sensor_ids_for_meta = [
         s.get("sensor_index") for s in sensors_status if s.get("sensor_index") is not None
