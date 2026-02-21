@@ -198,16 +198,14 @@
     async function loadSensors() {
       console.log("Loading sensors from purpleair_sensors…");
 
-      const params = new URLSearchParams(window.location.search);
-      const historySensor = params.get("sensor_index");
       
-      if (!historySensor) return;      
-    
+      const SENSOR_IDS = [166965, 249949, 83971, 91545];
+      
       const { data, error } = await supabase
-        .from("purpleair_sensors") 
+        .from("purpleair_sensors")
         .select("sensor_index, name, network")
-        .eq("sensor_index", historySensor)   // 🔥 filter to one sensor
-        .limit(1);
+        .in("sensor_index", SENSOR_IDS);
+
       
       if (error) {
         console.error("purpleair_sensors error:", error);
@@ -237,33 +235,15 @@
         removeItemButton: true,
         searchPlaceholderValue: "Type to search sensors…"
       });
-     
-
-      // ----------------------------------
-      // URL-driven selection (wins)
-      // ----------------------------------
-      const sensorFromURL = getQueryParam("sensor_index");
       
-      if (sensorFromURL) {
-        sensorChoices.removeActiveItems();
-        sensorChoices.setChoiceByValue([String(sensorFromURL)]);
+      // Auto-select all four sensors
+      sensorChoices.setChoiceByValue(
+        SENSOR_IDS.map(id => String(id))
+      );
       
-        if (sensorDropdown.selectedOptions.length > 0) {
-          fetchAndPlot();
-        } else {
-          Plotly.newPlot("plot", [], {
-            title: `Sensor ${sensorFromURL} not found`
-          });
-        }
-      } else {
-        Plotly.newPlot("plot", [], {
-          title: "Click a PurpleAir sensor on the map to view historical data"
-        });
-      }
-      
-      // Initial plot
+      // Immediately fetch and plot
       fetchAndPlot();
-    }
+    
 
 
     // -----------------------------
@@ -418,12 +398,9 @@
     // -----------------------------
     // 7. Init
     // -----------------------------
-    const hasSensorParam = !!getQueryParam("sensor_index");
-    if (hasSensorParam) {
-      setDefaultDates(7);
-    }
 
-
+    setDefaultDates(7);
+      
     startEl.addEventListener("change", fetchAndPlot);
     endEl.addEventListener("change", fetchAndPlot);
     sensorDropdown.addEventListener("change", fetchAndPlot);
