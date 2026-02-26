@@ -1,11 +1,11 @@
 {
-  "generated_at_utc": "2026-02-26T00:51:54.367536+00:00",
+  "generated_at_utc": "2026-02-26T01:33:30.876337+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1772066986,
-      "last_seen_iso_utc": "2026-02-26T00:49:46+00:00",
-      "humidity": 43,
+      "last_seen": 1772069506,
+      "last_seen_iso_utc": "2026-02-26T01:31:46+00:00",
+      "humidity": 46,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -20,14 +20,14 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1772067000,
-      "last_seen_iso_utc": "2026-02-26T00:50:00+00:00",
-      "humidity": 42,
-      "pm25_atm": 0.5,
-      "pm25_atm_a": 0.5,
-      "pm25_atm_b": 0.5,
-      "pm25_best": 0.5,
-      "pm25_corr": 0.42596944770857814,
+      "last_seen": 1772069520,
+      "last_seen_iso_utc": "2026-02-26T01:32:00+00:00",
+      "humidity": 45,
+      "pm25_atm": 0.3,
+      "pm25_atm_a": 0.3,
+      "pm25_atm_b": 0.4,
+      "pm25_best": 0.3,
+      "pm25_corr": 0.2507598784194529,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_Entwistle1(AQSU-6463)",
@@ -37,9 +37,9 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1772067090,
-      "last_seen_iso_utc": "2026-02-26T00:51:30+00:00",
-      "humidity": 42,
+      "last_seen": 1772069491,
+      "last_seen_iso_utc": "2026-02-26T01:31:31+00:00",
+      "humidity": 43,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -54,9 +54,9 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1772067060,
-      "last_seen_iso_utc": "2026-02-26T00:51:00+00:00",
-      "humidity": 45,
+      "last_seen": 1772069581,
+      "last_seen_iso_utc": "2026-02-26T01:33:01+00:00",
+      "humidity": 49,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -79,7 +79,7 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 0.10649236192714454,
+    "used_pm25_corr": 0.06268996960486323,
     "color_hex": "#01cbff",
     "duration_sec": 60
   }
