@@ -1,14 +1,14 @@
 {
-  "generated_at_utc": "2026-02-26T04:35:00.141027+00:00",
+  "generated_at_utc": "2026-02-26T05:27:39.003206+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1772080428,
-      "last_seen_iso_utc": "2026-02-26T04:33:48+00:00",
+      "last_seen": 1772083549,
+      "last_seen_iso_utc": "2026-02-26T05:25:49+00:00",
       "humidity": 40,
       "pm25_atm": 0.2,
       "pm25_atm_a": 0.1,
-      "pm25_atm_b": 0.3,
+      "pm25_atm_b": 0.4,
       "pm25_best": 0.2,
       "pm25_corr": 0.1724137931034483,
       "pm_method": "avg",
@@ -20,8 +20,8 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1772080442,
-      "last_seen_iso_utc": "2026-02-26T04:34:02+00:00",
+      "last_seen": 1772083563,
+      "last_seen_iso_utc": "2026-02-26T05:26:03+00:00",
       "humidity": 38,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
@@ -37,9 +37,9 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1772080413,
-      "last_seen_iso_utc": "2026-02-26T04:33:33+00:00",
-      "humidity": 42,
+      "last_seen": 1772083533,
+      "last_seen_iso_utc": "2026-02-26T05:25:33+00:00",
+      "humidity": 41,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -54,14 +54,14 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1772080383,
-      "last_seen_iso_utc": "2026-02-26T04:33:03+00:00",
+      "last_seen": 1772083624,
+      "last_seen_iso_utc": "2026-02-26T05:27:04+00:00",
       "humidity": 38,
-      "pm25_atm": 17.6,
-      "pm25_atm_a": 18.2,
-      "pm25_atm_b": 17.0,
-      "pm25_best": 17.6,
-      "pm25_corr": 15.34308211473566,
+      "pm25_atm": 16.6,
+      "pm25_atm_a": 16.8,
+      "pm25_atm_b": 16.4,
+      "pm25_best": 16.6,
+      "pm25_corr": 14.471316085489317,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_EntwistleRecCentre",
@@ -79,7 +79,7 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 3.878873976959777,
+    "used_pm25_corr": 3.6609324696481913,
     "color_hex": "#01cbff",
     "duration_sec": 60
   }
