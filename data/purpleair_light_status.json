@@ -1,11 +1,11 @@
 {
-  "generated_at_utc": "2026-02-26T16:47:52.593897+00:00",
+  "generated_at_utc": "2026-02-26T17:23:05.716440+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1772124355,
-      "last_seen_iso_utc": "2026-02-26T16:45:55+00:00",
-      "humidity": 38,
+      "last_seen": 1772126515,
+      "last_seen_iso_utc": "2026-02-26T17:21:55+00:00",
+      "humidity": 34,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -20,9 +20,9 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1772124370,
-      "last_seen_iso_utc": "2026-02-26T16:46:10+00:00",
-      "humidity": 36,
+      "last_seen": 1772126531,
+      "last_seen_iso_utc": "2026-02-26T17:22:11+00:00",
+      "humidity": 33,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -37,9 +37,9 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1772124459,
-      "last_seen_iso_utc": "2026-02-26T16:47:39+00:00",
-      "humidity": 38,
+      "last_seen": 1772126499,
+      "last_seen_iso_utc": "2026-02-26T17:21:39+00:00",
+      "humidity": 36,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -54,14 +54,14 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1772124432,
-      "last_seen_iso_utc": "2026-02-26T16:47:12+00:00",
-      "humidity": 33,
-      "pm25_atm": 7.0,
-      "pm25_atm_a": 8.1,
-      "pm25_atm_b": 6.0,
-      "pm25_best": 7.0,
-      "pm25_corr": 6.260010678056594,
+      "last_seen": 1772126472,
+      "last_seen_iso_utc": "2026-02-26T17:21:12+00:00",
+      "humidity": 30,
+      "pm25_atm": 0.0,
+      "pm25_atm_a": 0.0,
+      "pm25_atm_b": 0.0,
+      "pm25_best": 0.0,
+      "pm25_corr": 0.0,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_EntwistleRecCentre",
@@ -79,8 +79,8 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 1.5650026695141486,
-    "color_hex": "#01cbff",
+    "used_pm25_corr": 0.0,
+    "color_hex": "#D3D3D3",
     "duration_sec": 60
   }
 }
