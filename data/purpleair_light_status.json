@@ -1,16 +1,16 @@
 {
-  "generated_at_utc": "2026-03-06T23:06:39.242988+00:00",
+  "generated_at_utc": "2026-03-06T23:39:18.180096+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1772838349,
-      "last_seen_iso_utc": "2026-03-06T23:05:49+00:00",
+      "last_seen": 1772840268,
+      "last_seen_iso_utc": "2026-03-06T23:37:48+00:00",
       "humidity": 38,
-      "pm25_atm": 0.0,
-      "pm25_atm_a": 0.0,
-      "pm25_atm_b": 0.0,
-      "pm25_best": 0.0,
-      "pm25_corr": 0.0,
+      "pm25_atm": 6.0,
+      "pm25_atm_a": 5.0,
+      "pm25_atm_b": 7.0,
+      "pm25_best": 6.0,
+      "pm25_corr": 5.230596175478066,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_Entwistle2(AQSU-858E)",
@@ -20,9 +20,9 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1772838281,
-      "last_seen_iso_utc": "2026-03-06T23:04:41+00:00",
-      "humidity": 39,
+      "last_seen": 1772840322,
+      "last_seen_iso_utc": "2026-03-06T23:38:42+00:00",
+      "humidity": 38,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -37,9 +37,9 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1772838336,
-      "last_seen_iso_utc": "2026-03-06T23:05:36+00:00",
-      "humidity": 40,
+      "last_seen": 1772840256,
+      "last_seen_iso_utc": "2026-03-06T23:37:36+00:00",
+      "humidity": 41,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -54,12 +54,12 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1772838275,
-      "last_seen_iso_utc": "2026-03-06T23:04:35+00:00",
-      "humidity": 39,
+      "last_seen": 1772840315,
+      "last_seen_iso_utc": "2026-03-06T23:38:35+00:00",
+      "humidity": 38,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
-      "pm25_atm_b": 0.1,
+      "pm25_atm_b": 0.0,
       "pm25_best": 0.0,
       "pm25_corr": 0.0,
       "pm_method": "avg",
@@ -79,8 +79,8 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 0.0,
-    "color_hex": "#D3D3D3",
+    "used_pm25_corr": 1.3076490438695165,
+    "color_hex": "#01cbff",
     "duration_sec": 60
   }
 }
