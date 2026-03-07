@@ -1,11 +1,11 @@
 {
-  "generated_at_utc": "2026-03-07T11:03:34.803177+00:00",
+  "generated_at_utc": "2026-03-07T11:35:25.207196+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1772881315,
-      "last_seen_iso_utc": "2026-03-07T11:01:55+00:00",
-      "humidity": 51,
+      "last_seen": 1772883235,
+      "last_seen_iso_utc": "2026-03-07T11:33:55+00:00",
+      "humidity": 46,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -20,9 +20,9 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1772881369,
-      "last_seen_iso_utc": "2026-03-07T11:02:49+00:00",
-      "humidity": 49,
+      "last_seen": 1772883289,
+      "last_seen_iso_utc": "2026-03-07T11:34:49+00:00",
+      "humidity": 45,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -37,14 +37,14 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1772881303,
-      "last_seen_iso_utc": "2026-03-07T11:01:43+00:00",
-      "humidity": 49,
-      "pm25_atm": 0.0,
-      "pm25_atm_a": 0.0,
+      "last_seen": 1772883223,
+      "last_seen_iso_utc": "2026-03-07T11:33:43+00:00",
+      "humidity": 46,
+      "pm25_atm": 0.1,
+      "pm25_atm_a": 0.3,
       "pm25_atm_b": 0.0,
-      "pm25_best": 0.0,
-      "pm25_corr": 0.0,
+      "pm25_best": 0.1,
+      "pm25_corr": 0.08302583025830258,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_Evansburg1 (AQSU-A26A)",
@@ -54,9 +54,9 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1772881370,
-      "last_seen_iso_utc": "2026-03-07T11:02:50+00:00",
-      "humidity": 51,
+      "last_seen": 1772883290,
+      "last_seen_iso_utc": "2026-03-07T11:34:50+00:00",
+      "humidity": 48,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -79,8 +79,8 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 0.0,
-    "color_hex": "#D3D3D3",
+    "used_pm25_corr": 0.020756457564575646,
+    "color_hex": "#01cbff",
     "duration_sec": 60
   }
 }
