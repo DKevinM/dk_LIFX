@@ -1,11 +1,11 @@
 {
-  "generated_at_utc": "2026-03-08T17:05:21.277071+00:00",
+  "generated_at_utc": "2026-03-08T17:38:20.468001+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1772989453,
-      "last_seen_iso_utc": "2026-03-08T17:04:13+00:00",
-      "humidity": 25,
+      "last_seen": 1772991373,
+      "last_seen_iso_utc": "2026-03-08T17:36:13+00:00",
+      "humidity": 26,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -20,14 +20,14 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1772989388,
-      "last_seen_iso_utc": "2026-03-08T17:03:08+00:00",
-      "humidity": 24,
-      "pm25_atm": 0.0,
-      "pm25_atm_a": 0.0,
+      "last_seen": 1772991428,
+      "last_seen_iso_utc": "2026-03-08T17:37:08+00:00",
+      "humidity": 25,
+      "pm25_atm": 0.1,
+      "pm25_atm_a": 0.2,
       "pm25_atm_b": 0.0,
-      "pm25_best": 0.0,
-      "pm25_corr": 0.0,
+      "pm25_best": 0.1,
+      "pm25_corr": 0.0906735751295337,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_Entwistle1(AQSU-6463)",
@@ -37,9 +37,9 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1772989439,
-      "last_seen_iso_utc": "2026-03-08T17:03:59+00:00",
-      "humidity": 23,
+      "last_seen": 1772991479,
+      "last_seen_iso_utc": "2026-03-08T17:37:59+00:00",
+      "humidity": 24,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -54,9 +54,9 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1772989423,
-      "last_seen_iso_utc": "2026-03-08T17:03:43+00:00",
-      "humidity": 23,
+      "last_seen": 1772991451,
+      "last_seen_iso_utc": "2026-03-08T17:37:31+00:00",
+      "humidity": 24,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -79,8 +79,8 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 0.0,
-    "color_hex": "#D3D3D3",
+    "used_pm25_corr": 0.022668393782383424,
+    "color_hex": "#01cbff",
     "duration_sec": 60
   }
 }
