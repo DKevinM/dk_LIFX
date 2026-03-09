@@ -1,11 +1,11 @@
 {
-  "generated_at_utc": "2026-03-09T17:46:01.896930+00:00",
+  "generated_at_utc": "2026-03-09T18:15:26.070783+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1773078266,
-      "last_seen_iso_utc": "2026-03-09T17:44:26+00:00",
-      "humidity": 37,
+      "last_seen": 1773080067,
+      "last_seen_iso_utc": "2026-03-09T18:14:27+00:00",
+      "humidity": 35,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -20,9 +20,9 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1773078323,
-      "last_seen_iso_utc": "2026-03-09T17:45:23+00:00",
-      "humidity": 36,
+      "last_seen": 1773080003,
+      "last_seen_iso_utc": "2026-03-09T18:13:23+00:00",
+      "humidity": 34,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -37,14 +37,14 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1773078253,
-      "last_seen_iso_utc": "2026-03-09T17:44:13+00:00",
-      "humidity": 36,
-      "pm25_atm": 0.1,
-      "pm25_atm_a": 0.2,
-      "pm25_atm_b": 0.0,
-      "pm25_best": 0.1,
-      "pm25_corr": 0.0881057268722467,
+      "last_seen": 1773080054,
+      "last_seen_iso_utc": "2026-03-09T18:14:14+00:00",
+      "humidity": 34,
+      "pm25_atm": 0.0,
+      "pm25_atm_a": 0.0,
+      "pm25_atm_b": 0.1,
+      "pm25_best": 0.0,
+      "pm25_corr": 0.0,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_Evansburg1 (AQSU-A26A)",
@@ -54,9 +54,9 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1773078305,
-      "last_seen_iso_utc": "2026-03-09T17:45:05+00:00",
-      "humidity": 36,
+      "last_seen": 1773079985,
+      "last_seen_iso_utc": "2026-03-09T18:13:05+00:00",
+      "humidity": 32,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -79,8 +79,8 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 0.022026431718061675,
-    "color_hex": "#01cbff",
+    "used_pm25_corr": 0.0,
+    "color_hex": "#D3D3D3",
     "duration_sec": 60
   }
 }
