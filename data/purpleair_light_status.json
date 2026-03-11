@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-11T19:44:08.459676+00:00",
+  "generated_at_utc": "2026-03-11T20:08:11.681057+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
@@ -20,8 +20,8 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1773258119,
-      "last_seen_iso_utc": "2026-03-11T19:41:59+00:00",
+      "last_seen": 1773259559,
+      "last_seen_iso_utc": "2026-03-11T20:05:59+00:00",
       "humidity": 31,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
@@ -37,8 +37,8 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1773258161,
-      "last_seen_iso_utc": "2026-03-11T19:42:41+00:00",
+      "last_seen": 1773259602,
+      "last_seen_iso_utc": "2026-03-11T20:06:42+00:00",
       "humidity": 31,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
@@ -61,9 +61,9 @@
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
       "pm25_best": 0.0,
-      "pm25_corr": 0.0,
+      "pm25_corr": null,
       "pm_method": "avg",
-      "is_fresh": true,
+      "is_fresh": false,
       "name": "WCAS_EntwistleRecCentre",
       "latitude": 53.593185,
       "longitude": -114.99485,
@@ -75,8 +75,7 @@
     "strategy": "average_fresh_sensors",
     "used_sensor_indices": [
       91545,
-      166965,
-      249949
+      166965
     ],
     "used_pm25_corr": 0.0,
     "color_hex": "#D3D3D3",
