@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-11T13:28:02.854271+00:00",
+  "generated_at_utc": "2026-03-11T13:54:29.028543+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
@@ -20,14 +20,14 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1773235552,
-      "last_seen_iso_utc": "2026-03-11T13:25:52+00:00",
-      "humidity": 36,
-      "pm25_atm": 0.1,
-      "pm25_atm_a": 0.0,
-      "pm25_atm_b": 0.2,
-      "pm25_best": 0.1,
-      "pm25_corr": 0.0881057268722467,
+      "last_seen": 1773237232,
+      "last_seen_iso_utc": "2026-03-11T13:53:52+00:00",
+      "humidity": 38,
+      "pm25_atm": 0.2,
+      "pm25_atm_a": 0.1,
+      "pm25_atm_b": 0.3,
+      "pm25_best": 0.2,
+      "pm25_corr": 0.17435320584926886,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_Entwistle1(AQSU-6463)",
@@ -37,14 +37,14 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1773235598,
-      "last_seen_iso_utc": "2026-03-11T13:26:38+00:00",
+      "last_seen": 1773237158,
+      "last_seen_iso_utc": "2026-03-11T13:52:38+00:00",
       "humidity": 38,
-      "pm25_atm": 0.2,
-      "pm25_atm_a": 0.0,
-      "pm25_atm_b": 0.5,
-      "pm25_best": 0.2,
-      "pm25_corr": 0.17435320584926886,
+      "pm25_atm": 0.1,
+      "pm25_atm_a": 0.2,
+      "pm25_atm_b": 0.0,
+      "pm25_best": 0.1,
+      "pm25_corr": 0.08717660292463443,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_Evansburg1 (AQSU-A26A)",
@@ -54,9 +54,9 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1773235648,
-      "last_seen_iso_utc": "2026-03-11T13:27:28+00:00",
-      "humidity": 43,
+      "last_seen": 1773237208,
+      "last_seen_iso_utc": "2026-03-11T13:53:28+00:00",
+      "humidity": 44,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -78,7 +78,7 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 0.08748631090717185,
+    "used_pm25_corr": 0.08717660292463443,
     "color_hex": "#01cbff",
     "duration_sec": 60
   }
