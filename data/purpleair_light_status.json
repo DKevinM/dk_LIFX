@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-13T11:10:40.666417+00:00",
+  "generated_at_utc": "2026-03-13T11:41:34.414782+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
@@ -20,12 +20,12 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1773400112,
-      "last_seen_iso_utc": "2026-03-13T11:08:32+00:00",
+      "last_seen": 1773402033,
+      "last_seen_iso_utc": "2026-03-13T11:40:33+00:00",
       "humidity": 47,
       "pm25_atm": 3.3,
-      "pm25_atm_a": 3.4,
-      "pm25_atm_b": 3.1,
+      "pm25_atm_a": 3.2,
+      "pm25_atm_b": 3.4,
       "pm25_best": 3.3,
       "pm25_corr": 2.7209085252022405,
       "pm_method": "avg",
@@ -37,14 +37,14 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1773400144,
-      "last_seen_iso_utc": "2026-03-13T11:09:04+00:00",
-      "humidity": 51,
-      "pm25_atm": 3.5,
+      "last_seen": 1773402064,
+      "last_seen_iso_utc": "2026-03-13T11:41:04+00:00",
+      "humidity": 52,
+      "pm25_atm": 4.4,
       "pm25_atm_a": 2.4,
-      "pm25_atm_b": 4.6,
-      "pm25_best": 3.5,
-      "pm25_corr": 2.8004572175048987,
+      "pm25_atm_b": 6.4,
+      "pm25_best": 4.4,
+      "pm25_corr": 3.4920634920634925,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_Evansburg1 (AQSU-A26A)",
@@ -54,14 +54,14 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1773400169,
-      "last_seen_iso_utc": "2026-03-13T11:09:29+00:00",
+      "last_seen": 1773401969,
+      "last_seen_iso_utc": "2026-03-13T11:39:29+00:00",
       "humidity": 58,
-      "pm25_atm": 7.1,
-      "pm25_atm_a": 7.3,
-      "pm25_atm_b": 6.9,
-      "pm25_best": 7.1,
-      "pm25_corr": 5.3326180257510725,
+      "pm25_atm": 80.8,
+      "pm25_atm_a": 82.3,
+      "pm25_atm_b": 79.3,
+      "pm25_best": 80.8,
+      "pm25_corr": 60.68669527896996,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_EntwistleRecCentre",
@@ -78,8 +78,8 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 3.6179945894860706,
-    "color_hex": "#01cbff",
+    "used_pm25_corr": 22.29988909874523,
+    "color_hex": "#016797",
     "duration_sec": 60
   }
 }
