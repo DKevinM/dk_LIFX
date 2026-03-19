@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-19T17:20:54.457105+00:00",
+  "generated_at_utc": "2026-03-19T17:47:19.231740+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
@@ -16,14 +16,14 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1773940810,
-      "last_seen_iso_utc": "2026-03-19T17:20:10+00:00",
-      "humidity": 67,
-      "pm25_atm": 0.1,
+      "last_seen": 1773942370,
+      "last_seen_iso_utc": "2026-03-19T17:46:10+00:00",
+      "humidity": 66,
+      "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
-      "pm25_atm_b": 0.2,
-      "pm25_best": 0.1,
-      "pm25_corr": 0.06723716381418093,
+      "pm25_atm_b": 0.0,
+      "pm25_best": 0.0,
+      "pm25_corr": 0.0,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_Entwistle1(AQSU-6463)",
@@ -33,9 +33,9 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1773940713,
-      "last_seen_iso_utc": "2026-03-19T17:18:33+00:00",
-      "humidity": 72,
+      "last_seen": 1773942393,
+      "last_seen_iso_utc": "2026-03-19T17:46:33+00:00",
+      "humidity": 70,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -50,14 +50,14 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1773940744,
-      "last_seen_iso_utc": "2026-03-19T17:19:04+00:00",
-      "humidity": 72,
-      "pm25_atm": 0.2,
-      "pm25_atm_a": 0.3,
-      "pm25_atm_b": 0.2,
-      "pm25_best": 0.2,
-      "pm25_corr": 0.12820512820512822,
+      "last_seen": 1773942424,
+      "last_seen_iso_utc": "2026-03-19T17:47:04+00:00",
+      "humidity": 68,
+      "pm25_atm": 16.6,
+      "pm25_atm_a": 16.5,
+      "pm25_atm_b": 16.6,
+      "pm25_best": 16.6,
+      "pm25_corr": 10.99337748344371,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_EntwistleRecCentre",
@@ -74,7 +74,7 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 0.06514743067310305,
+    "used_pm25_corr": 3.6644591611479034,
     "color_hex": "#01cbff",
     "duration_sec": 60
   }
