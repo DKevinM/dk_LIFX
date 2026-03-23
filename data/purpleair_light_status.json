@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-23T05:56:33.548428+00:00",
+  "generated_at_utc": "2026-03-23T06:31:10.136231+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
@@ -16,26 +16,26 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1774245305,
-      "last_seen_iso_utc": "2026-03-23T05:55:05+00:00",
-      "humidity": 45,
-      "pm25_atm": 1.6,
-      "pm25_atm_a": 1.2,
-      "pm25_atm_b": 1.9,
-      "pm25_best": 1.6,
-      "pm25_corr": 1.3373860182370823,
+      "last_seen": 1774247346,
+      "last_seen_iso_utc": "2026-03-23T06:29:06+00:00",
+      "humidity": 44,
+      "pm25_atm": 0.3,
+      "pm25_atm_a": 0.0,
+      "pm25_atm_b": 0.7,
+      "pm25_best": 0.3,
+      "pm25_corr": 0.25240384615384615,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_Entwistle1(AQSU-6463)",
       "latitude": 53.593525,
       "longitude": -114.971245,
-      "geometry": null
+      "geometry": "POINT (-114.971245 53.593525)"
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1774245325,
-      "last_seen_iso_utc": "2026-03-23T05:55:25+00:00",
-      "humidity": 48,
+      "last_seen": 1774247365,
+      "last_seen_iso_utc": "2026-03-23T06:29:25+00:00",
+      "humidity": 47,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -46,13 +46,13 @@
       "name": "WCAS_Evansburg1 (AQSU-A26A)",
       "latitude": 53.60466,
       "longitude": -115.018326,
-      "geometry": null
+      "geometry": "POINT (-115.018326 53.60466)"
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1774245264,
-      "last_seen_iso_utc": "2026-03-23T05:54:24+00:00",
-      "humidity": 53,
+      "last_seen": 1774247424,
+      "last_seen_iso_utc": "2026-03-23T06:30:24+00:00",
+      "humidity": 52,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -63,7 +63,7 @@
       "name": "WCAS_EntwistleRecCentre",
       "latitude": 53.593185,
       "longitude": -114.99485,
-      "geometry": null
+      "geometry": "POINT (-114.99485 53.593185)"
     }
   ],
   "light": {
@@ -74,7 +74,7 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 0.44579533941236077,
+    "used_pm25_corr": 0.08413461538461538,
     "color_hex": "#01cbff",
     "duration_sec": 60
   }
