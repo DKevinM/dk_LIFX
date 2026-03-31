@@ -488,9 +488,19 @@ def main():
 
 
 if __name__ == "__main__":
-    # If manual color was supplied, handle that and exit.
     if manual_override():
         exit(0)
 
-    # Otherwise run normal PurpleAir logic
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"FATAL ERROR: {e}")
+
+        # Fallback to white
+        try:
+            set_lifx_color("white")
+            print("Set LIFX to WHITE as fallback.")
+        except Exception as e2:
+            print(f"Failed to set fallback white color: {e2}")
+
+        exit(1)
