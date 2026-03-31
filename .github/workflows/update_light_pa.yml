@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       color:
-        description: "Manual hex color override (ex: #FF0000). Leave blank to use PurpleAir."
+        description: "Manual hex color override (red = #9a0100; yellow = #fffe03; blue = #0099cb). Leave blank to use Average PurpleAir."
         required: false
         default: ""
 
