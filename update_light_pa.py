@@ -16,7 +16,8 @@ import pandas as pd
 # PURPLEAIR_SENSORS = [123421]  # Spruce Grove / Mom's sensor test case
 PURPLEAIR_SENSORS = [166965,83971,91545,249949]  # Evansburg / Entwistle
 # LIFX device ID (serial)
-LIFX_DEVICE_ID = "d073d568e6e8"
+# LIFX_DEVICE_ID = "d073d568e6e8"
+LIFX_DEVICE_ID = "D073D5D54604"
 
 # Duration for LIFX color fade
 LIFX_DURATION_SEC = 60
@@ -65,8 +66,11 @@ def choose_pm_and_method(a, b, avg, forced=None):
         if diff > 500:
             return None, "extreme_diff_reject"
         if diff > 50:
-            return min(a, b), "min_ab"
-        if not _is_na(avg) and avg >= 0:
+            if max(a, b) < 50:   # low concentrations → noise dominates
+                return min(a, b), "min_low_range"
+            else:
+                return max(a, b), "max_high_range"
+        if not _is_na(avg) and 0 <= avg <= 2500:
             return avg, "avg"
 
     return avg, "fallback_avg"
@@ -88,9 +92,6 @@ def load_channel_override_local(path="data/channel_override.csv"):
         return dict(zip(df["sensor_index"], df["force_channel"]))
     except Exception:
         return {}
-
-
-
 
 
 
