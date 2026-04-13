@@ -407,31 +407,32 @@
           }
         
           let messageHTML = "";
-        
+          
           if (est === obs) {
             messageHTML = `
               <div class="info-small" style="margin-top:6px;">
                 <strong>${obsMsg.level} Risk (${obsMsg.range})</strong><br>
-                ${obsMsg.atRisk}<br>
-                ${obsMsg.general}
+                <strong>At Risk:</strong> ${obsMsg.atRisk}<br>
+                <strong>General:</strong> ${obsMsg.general}
               </div>
             `;
           } else {
             messageHTML = `
               <div class="info-small" style="margin-top:6px;">
                 <strong>Observed Guidance (${obsMsg.level})</strong><br>
-                ${obsMsg.atRisk}<br>
-                ${obsMsg.general}
+                <strong>At Risk:</strong> ${obsMsg.atRisk}<br>
+                <strong>General:</strong> ${obsMsg.general}
               </div>
             `;
           }
         
           comparisonHTML = `
-            <div style="margin-top:8px; font-size:0.85rem;">
+            <div style="margin-top:10px; font-size:0.85rem;">
               Estimated: <strong>${est}</strong> (${estMsg?.level || ""})<br>
               Observed: <strong>${obs}</strong> (${obsMsg?.level || ""})<br>
               Status: <strong style="color:${color}">${status}</strong>
             </div>
+          
             ${messageHTML}
           `;
         }
@@ -449,6 +450,9 @@
             <div style="margin-left:10px; font-size:15px; font-weight:600;">
               estimated AQHI: ${estAQHI}
             </div>
+          </div>
+          
+          <div style="margin-top:6px;">
             ${comparisonHTML}
           </div>
       
