@@ -389,24 +389,25 @@
           const est = Number(estAQHI);
           const obs = aqhiCompare.rounded;
         
-          const obsMsg = getAQHIMessage(obs);
-          const obsLabel = `${obsMsg.level} (${obsMsg.range})`;
+          const estMsg = getAQHIMessage(est);
+          const estLabel = `${estMsg.level} (${estMsg.range})`;
           
           const messageHTML = `
             <div class="info-small" style="margin-top:6px;">
-              <strong>Guidance (${obsLabel})</strong><br>
-              <strong>At Risk:</strong> ${obsMsg.atRisk}<br>
-              <strong>General:</strong> ${obsMsg.general}
+              <strong>Guidance (${estLabel})</strong><br>
+              <strong>At Risk:</strong> ${estMsg.atRisk}<br>
+              <strong>General:</strong> ${estMsg.general}
             </div>
           `;
           
           const displayHTML = `
             <div style="margin-top:10px; font-size:0.85rem;">
-              AQHI: <strong>${obs}</strong> (${obsLabel})<br>
+              Estimated AQHI: <strong>${est}</strong> (${estLabel})<br>
             </div>
           
             ${messageHTML}
           `;
+          comparisonHTML = displayHTML;
         }
         
 
