@@ -394,7 +394,6 @@
           
           const messageHTML = `
             <div class="info-small" style="margin-top:6px;">
-              <strong>Guidance (${estLabel})</strong><br>
               <strong>At Risk:</strong> ${estMsg.atRisk}<br>
               <strong>General:</strong> ${estMsg.general}
             </div>
@@ -402,7 +401,7 @@
           
           const displayHTML = `
             <div style="margin-top:10px; font-size:0.85rem;">
-              Estimated AQHI: <strong>${est}</strong> (${estLabel})<br>
+              Estimated AQHI: <strong>${estLabel}</strong><br>
             </div>
           
             ${messageHTML}
