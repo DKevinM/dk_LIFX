@@ -383,12 +383,12 @@
       try {
         const resp = await fetch("data/purpleair_light_status.json?cb=" + Date.now());
         if (!resp.ok) {
-          const props = {
-            generatedAtLocal: "(no JSON)",
-            avgPm: null,
-            nSensors: 0,
-            lat: null,
-            lon: null
+            const props = {
+              generatedAtLocal,
+              avgPm,
+              nSensors,
+              lat,
+              lon
           };
         
           window.latestInfoProps = props;
@@ -431,9 +431,9 @@
           generatedAtLocal,
           avgPm,
           nSensors,
-          lat: refSensor?.latitude,
-          lon: refSensor?.longitude
-        });
+          lat,
+          lon
+        };
         
         window.latestInfoProps = props;
         
@@ -448,16 +448,16 @@
         // Plot sensors
         const markers = [];
         sensors.forEach(s => {
-          const lat = s.latitude;
-          const lon = s.longitude;
-          if (lat == null || lon == null) return;
+          const sLat = s.latitude;
+          const sLon = s.longitude;
+          if (sLat == null || sLon == null) return;
 
           const pm = (typeof s.pm25_corr === "number") ? s.pm25_corr : null;
           const color = pmToColor(pm);
           const name = s.name || `Sensor ${s.sensor_index}`;
           const lastSeenLocal = toEdmontonLocal(s.last_seen_iso_utc);
 
-          const marker = L.circleMarker([lat, lon], {
+          const marker = L.circleMarker([sLat, sLon], {
             radius: 10,
             color: "#111827",
             weight: 1,
