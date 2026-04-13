@@ -156,7 +156,6 @@
     
 
     // --- AQHI COMPARISON ---------------------------------------------
-    
     async function fetchAQHIStations() {
       const url = "https://raw.githubusercontent.com/DKevinM/AB_datapull/main/data/last6h.csv";
       const res = await fetch(url);
@@ -170,31 +169,38 @@
       const idxLon = headers.indexOf("Longitude");
       const idxParam = headers.indexOf("ParameterName");
       const idxValue = headers.indexOf("Value");
+      const idxDate = headers.indexOf("ReadingDate");
     
-      const stations = [];
+      const stationMap = {};
     
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
-      
+    
         const param = row[idxParam];
-      
-        // AQHI = blank parameter
-        if (param !== "") continue;
-      
+        if (param !== "") continue; // AQHI only
+    
+        const station = row[idxStation];
+        const val = parseFloat(row[idxValue]);
         const lat = parseFloat(row[idxLat]);
         const lon = parseFloat(row[idxLon]);
-        const val = parseFloat(row[idxValue]);
-      
-        // IMPORTANT: allow lat/lon but only require value
+        const time = new Date(row[idxDate]).getTime();
+    
         if (!isFinite(val)) continue;
-      
-        stations.push({
-          station: row[idxStation],
-          lat,
-          lon,
-          value: val
-        });
+    
+        if (!stationMap[station] || time > stationMap[station].time) {
+          stationMap[station] = {
+            station,
+            lat,
+            lon,
+            value: val,
+            time
+          };
+        }
       }
+    
+      const stations = Object.values(stationMap);
+    
+      console.log("AQHI stations parsed:", stations.length);
     
       return stations;
     }
