@@ -153,6 +153,43 @@
     }
 
 
+    function getAQHIMessage(aqhi) {
+      if (!isFinite(aqhi)) return null;
+      if (aqhi <= 3) {
+        return {
+          level: "Low",
+          range: "1 - 3",
+          atRisk: "Enjoy your usual outdoor activities.",
+          general: "Ideal air quality for outdoor activities."
+        };
+      }
+      if (aqhi <= 6) {
+        return {
+          level: "Moderate",
+          range: "4 - 6",
+          atRisk: "Consider reducing or rescheduling strenuous activities outdoors if you are experiencing symptoms.",
+          general: "No need to modify your usual outdoor activities unless you experience symptoms such as coughing and throat irritation."
+        };
+      }
+      if (aqhi <= 10) {
+        return {
+          level: "High",
+          range: "7 - 10",
+          atRisk: "Reduce or reschedule strenuous activities outdoors. Children and the elderly should also take it easy.",
+          general: "Consider reducing or rescheduling strenuous activities outdoors if you experience symptoms such as coughing and throat irritation."
+        };
+      }
+      return {
+        level: "Very High",
+        range: "10+",
+        atRisk: "Avoid strenuous activities outdoors. Children and the elderly should also avoid outdoor physical exertion.",
+        general: "Reduce or reschedule strenuous activities outdoors, especially if you experience symptoms such as coughing and throat irritation."
+      };
+    }
+
+
+
+    
     
 
     // --- AQHI COMPARISON ---------------------------------------------
@@ -346,6 +383,60 @@
         }
 
 
+        let comparisonHTML = "";
+        
+        if (aqhiCompare && isFinite(Number(estAQHI))) {
+          const est = Number(estAQHI);
+          const obs = aqhiCompare.rounded;
+        
+          const estMsg = getAQHIMessage(est);
+          const obsMsg = getAQHIMessage(obs);
+        
+          let status = "";
+          let color = "#9ca3af";
+        
+          if (est === obs) {
+            status = "Agreement";
+            color = "#22c55e";
+          } else if (est > obs) {
+            status = `Overestimate (+${est - obs})`;
+            color = "#f59e0b";
+          } else {
+            status = `Underestimate (${est - obs})`;
+            color = "#ef4444";
+          }
+        
+          let messageHTML = "";
+        
+          if (est === obs) {
+            messageHTML = `
+              <div class="info-small" style="margin-top:6px;">
+                <strong>${obsMsg.level} Risk (${obsMsg.range})</strong><br>
+                ${obsMsg.atRisk}<br>
+                ${obsMsg.general}
+              </div>
+            `;
+          } else {
+            messageHTML = `
+              <div class="info-small" style="margin-top:6px;">
+                <strong>Observed Guidance (${obsMsg.level})</strong><br>
+                ${obsMsg.atRisk}<br>
+                ${obsMsg.general}
+              </div>
+            `;
+          }
+        
+          comparisonHTML = `
+            <div style="margin-top:8px; font-size:0.85rem;">
+              Estimated: <strong>${est}</strong> (${estMsg?.level || ""})<br>
+              Observed: <strong>${obs}</strong> (${obsMsg?.level || ""})<br>
+              Status: <strong style="color:${color}">${status}</strong>
+            </div>
+            ${messageHTML}
+          `;
+        }
+        
+
         
         this._div.innerHTML = `
           <div class="info-title">PurpleAir – Corrected PM2.5</div>
@@ -358,6 +449,7 @@
             <div style="margin-left:10px; font-size:15px; font-weight:600;">
               estimated AQHI: ${estAQHI}
             </div>
+            ${comparisonHTML}
           </div>
       
           <div class="info-label" style="margin-top:10px;">Generated:</div>
