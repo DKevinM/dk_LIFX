@@ -135,6 +135,26 @@
     }
 
 
+    async function fetchStationGeo() {
+      const url = "https://raw.githubusercontent.com/DKevinM/AB_datapull/main/data/stations.geojson";
+      const res = await fetch(url);
+      const geo = await res.json();
+    
+      const map = {};
+    
+      geo.features.forEach(f => {
+        const name = f.properties.StationName;
+        const [lon, lat] = f.geometry.coordinates;
+    
+        map[name] = { lat, lon };
+      });
+    
+      return map;
+    }
+
+
+    
+
     // --- AQHI COMPARISON ---------------------------------------------
     
     async function fetchAQHIStations() {
@@ -155,15 +175,19 @@
     
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
-    
-        if (row[idxParam] !== "AQHI") continue;
-    
+      
+        const param = row[idxParam];
+      
+        // AQHI = blank parameter
+        if (param !== "") continue;
+      
         const lat = parseFloat(row[idxLat]);
         const lon = parseFloat(row[idxLon]);
         const val = parseFloat(row[idxValue]);
-    
-        if (!isFinite(lat) || !isFinite(lon) || !isFinite(val)) continue;
-    
+      
+        // IMPORTANT: allow lat/lon but only require value
+        if (!isFinite(val)) continue;
+      
         stations.push({
           station: row[idxStation],
           lat,
