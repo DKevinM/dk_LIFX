@@ -249,7 +249,9 @@
       } catch (e) {
         console.error("AQHI load failed:", e);
       }      
-      
+
+      console.log("AQHI stations loaded:", aqhiStations.length);  
+            
       // Info control (top-left)
       const info = L.control({ position: "topleft" });
 
@@ -372,17 +374,26 @@
 
       info.addTo(map);
 
+      if (window.latestInfoProps) {
+        info.update(window.latestInfoProps);
+      }   
+      
+
       // Load JSON
       try {
         const resp = await fetch("data/purpleair_light_status.json?cb=" + Date.now());
         if (!resp.ok) {
-        info.update({
-          generatedAtLocal: "(no JSON)",
-          avgPm: null,
-          nSensors: 0,
-          lat: null,
-          lon: null
-        });
+          const props = {
+            generatedAtLocal: "(no JSON)",
+            avgPm: null,
+            nSensors: 0,
+            lat: null,
+            lon: null
+          };
+        
+          window.latestInfoProps = props;
+          info.update(props);
+        
           console.error("Failed to fetch JSON:", resp.status, await resp.text());
           return;
         }
@@ -401,15 +412,38 @@
           : 0;
 
         const generatedAtLocal = toEdmontonLocal(data.generated_at_utc);
-        const refSensor = sensors.find(s => s.latitude && s.longitude);
+        const validSensors = sensors.filter(s =>
+          s.latitude != null &&
+          s.longitude != null &&
+          !isNaN(Number(s.latitude)) &&
+          !isNaN(Number(s.longitude))
+        );
         
-        info.update({
+        let lat = null;
+        let lon = null;
+        
+        if (validSensors.length > 0) {
+          lat = validSensors.reduce((sum, s) => sum + Number(s.latitude), 0) / validSensors.length;
+          lon = validSensors.reduce((sum, s) => sum + Number(s.longitude), 0) / validSensors.length;
+        }
+        
+        const props = {
           generatedAtLocal,
           avgPm,
           nSensors,
           lat: refSensor?.latitude,
           lon: refSensor?.longitude
         });
+        
+        window.latestInfoProps = props;
+        
+        info.update(props);
+
+        // force AQHI compare if stations already loaded
+        if (aqhiStations.length > 0) {
+          info.update(window.latestInfoProps);
+        }
+        
 
         // Plot sensors
         const markers = [];
