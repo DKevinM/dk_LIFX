@@ -134,6 +134,100 @@
       }
     }
 
+
+    // --- AQHI COMPARISON ---------------------------------------------
+    
+    async function fetchAQHIStations() {
+      const url = "https://raw.githubusercontent.com/DKevinM/AB_datapull/main/data/output/last6h.csv";
+      const res = await fetch(url);
+      const text = await res.text();
+    
+      const rows = text.split("\n").map(r => r.split(","));
+      const headers = rows[0];
+    
+      const idxStation = headers.indexOf("StationName");
+      const idxLat = headers.indexOf("Latitude");
+      const idxLon = headers.indexOf("Longitude");
+      const idxParam = headers.indexOf("ParameterName");
+      const idxValue = headers.indexOf("Value");
+    
+      const stations = [];
+    
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+    
+        if (row[idxParam] !== "AQHI") continue;
+    
+        const lat = parseFloat(row[idxLat]);
+        const lon = parseFloat(row[idxLon]);
+        const val = parseFloat(row[idxValue]);
+    
+        if (!isFinite(lat) || !isFinite(lon) || !isFinite(val)) continue;
+    
+        stations.push({
+          station: row[idxStation],
+          lat,
+          lon,
+          value: val
+        });
+      }
+    
+      return stations;
+    }
+    
+    
+    function haversine(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const toRad = x => x * Math.PI / 180;
+    
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+    
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) ** 2;
+    
+      return 2 * R * Math.asin(Math.sqrt(a));
+    }
+    
+    
+    function getThreeClosestAQHI(stations, lat, lon) {
+      const withDist = stations.map(s => ({
+        ...s,
+        distance: haversine(lat, lon, s.lat, s.lon)
+      }));
+    
+      withDist.sort((a, b) => a.distance - b.distance);
+    
+      const closest3 = withDist.slice(0, 3);
+    
+      if (closest3.length === 0) return null;
+    
+      let weightedSum = 0;
+      let weightTotal = 0;
+    
+      closest3.forEach(s => {
+        const w = 1 / Math.max(s.distance, 0.1);
+        weightedSum += s.value * w;
+        weightTotal += w;
+      });
+    
+      const avg = weightedSum / weightTotal;
+      const rounded = Math.ceil(avg);   // <-- YOUR RULE
+    
+      return {
+        stations: closest3,
+        avg,
+        rounded
+      };
+    }
+
+
+
+
+
     
 
     
@@ -148,6 +242,14 @@
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
 
+      let aqhiStations = [];
+      
+      try {
+        aqhiStations = await fetchAQHIStations();
+      } catch (e) {
+        console.error("AQHI load failed:", e);
+      }      
+      
       // Info control (top-left)
       const info = L.control({ position: "topleft" });
 
@@ -193,7 +295,7 @@
         }
       
         // ---------- DATA AVAILABLE ----------
-        const { generatedAtLocal, avgPm, nSensors } = props;
+        const { generatedAtLocal, avgPm, nSensors, lat, lon } = props;
       
         const hasAvg = typeof avgPm === "number";
         const boxColor = hasAvg ? pmToColor(avgPm) : "#9CA3AF";
@@ -203,7 +305,16 @@
           let val = Math.floor(avgPm / 10) + 1;
           estAQHI = val > 10 ? "10+" : val;
         }
-      
+
+
+        let aqhiCompare = null;
+        
+        if (lat != null && lon != null && aqhiStations.length > 0) {
+          aqhiCompare = getThreeClosestAQHI(aqhiStations, lat, lon);
+        }
+
+
+        
         this._div.innerHTML = `
           <div class="info-title">PurpleAir – Corrected PM2.5</div>
       
@@ -226,6 +337,24 @@
           <div class="info-small" style="margin-top:6px;">
             ${nSensors} sensor${nSensors === 1 ? "" : "s"} averaged
           </div>
+
+
+          ${aqhiCompare ? `
+            <div class="info-label" style="margin-top:10px;">3-Station AQHI:</div>
+            <div><strong>${aqhiCompare.rounded}</strong> (avg ${aqhiCompare.avg.toFixed(2)})</div>
+          
+            <div class="info-small">
+              ${aqhiCompare.stations.map((s,i) =>
+                `${i+1}. ${s.station} (${s.distance.toFixed(1)} km): ${s.value}`
+              ).join("<br>")}
+            </div>
+          
+            <div class="info-small" style="margin-top:6px;">
+              Δ vs estimate: ${isFinite(Number(estAQHI)) ? (Number(estAQHI) - aqhiCompare.rounded).toFixed(1) : "n/a"}
+            </div>
+          ` : ""}
+
+
       
           <div class="resource-links">
             <div class="info-label">External Resources</div>
@@ -247,11 +376,13 @@
       try {
         const resp = await fetch("data/purpleair_light_status.json?cb=" + Date.now());
         if (!resp.ok) {
-          info.update({
-            generatedAtLocal: "(no JSON)",
-            avgPm: null,
-            nSensors: 0
-          });
+        info.update({
+          generatedAtLocal: "(no JSON)",
+          avgPm: null,
+          nSensors: 0,
+          lat: null,
+          lon: null
+        });
           console.error("Failed to fetch JSON:", resp.status, await resp.text());
           return;
         }
@@ -270,11 +401,14 @@
           : 0;
 
         const generatedAtLocal = toEdmontonLocal(data.generated_at_utc);
-
+        const refSensor = sensors.find(s => s.latitude && s.longitude);
+        
         info.update({
           generatedAtLocal,
           avgPm,
-          nSensors
+          nSensors,
+          lat: refSensor?.latitude,
+          lon: refSensor?.longitude
         });
 
         // Plot sensors
