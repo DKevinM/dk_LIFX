@@ -389,48 +389,20 @@
           const est = Number(estAQHI);
           const obs = aqhiCompare.rounded;
         
-          const estMsg = getAQHIMessage(est);
           const obsMsg = getAQHIMessage(obs);
-        
-          let status = "";
-          let color = "#9ca3af";
-        
-          if (est === obs) {
-            status = "Agreement";
-            color = "#22c55e";
-          } else if (est > obs) {
-            status = `Overestimate (+${est - obs})`;
-            color = "#f59e0b";
-          } else {
-            status = `Underestimate (${est - obs})`;
-            color = "#ef4444";
-          }
-        
-          let messageHTML = "";
+          const obsLabel = `${obsMsg.level} (${obsMsg.range})`;
           
-          if (est === obs) {
-            messageHTML = `
-              <div class="info-small" style="margin-top:6px;">
-                <strong>${obsMsg.level} Risk (${obsMsg.range})</strong><br>
-                <strong>At Risk:</strong> ${obsMsg.atRisk}<br>
-                <strong>General:</strong> ${obsMsg.general}
-              </div>
-            `;
-          } else {
-            messageHTML = `
-              <div class="info-small" style="margin-top:6px;">
-                <strong>Observed Guidance (${obsMsg.level})</strong><br>
-                <strong>At Risk:</strong> ${obsMsg.atRisk}<br>
-                <strong>General:</strong> ${obsMsg.general}
-              </div>
-            `;
-          }
-        
-          comparisonHTML = `
+          const messageHTML = `
+            <div class="info-small" style="margin-top:6px;">
+              <strong>Guidance (${obsLabel})</strong><br>
+              <strong>At Risk:</strong> ${obsMsg.atRisk}<br>
+              <strong>General:</strong> ${obsMsg.general}
+            </div>
+          `;
+          
+          const displayHTML = `
             <div style="margin-top:10px; font-size:0.85rem;">
-              Estimated: <strong>${est}</strong> (${estMsg?.level || ""})<br>
-              Observed: <strong>${obs}</strong> (${obsMsg?.level || ""})<br>
-              Status: <strong style="color:${color}">${status}</strong>
+              AQHI: <strong>${obs}</strong> (${obsLabel})<br>
             </div>
           
             ${messageHTML}
@@ -478,9 +450,6 @@
               ).join("<br>")}
             </div>
           
-            <div class="info-small" style="margin-top:6px;">
-              Δ vs estimate: ${isFinite(Number(estAQHI)) ? (Number(estAQHI) - aqhiCompare.rounded).toFixed(1) : "n/a"}
-            </div>
           ` : ""}
 
 
