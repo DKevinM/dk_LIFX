@@ -1,16 +1,16 @@
 {
-  "generated_at_utc": "2026-04-20T17:22:45.901754+00:00",
+  "generated_at_utc": "2026-04-20T17:47:33.665607+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1776705651,
-      "last_seen_iso_utc": "2026-04-20T17:20:51+00:00",
-      "humidity": 32,
-      "pm25_atm": 0.1,
-      "pm25_atm_a": 0.1,
+      "last_seen": 1776707212,
+      "last_seen_iso_utc": "2026-04-20T17:46:52+00:00",
+      "humidity": 30,
+      "pm25_atm": 0.0,
+      "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
-      "pm25_best": 0.1,
-      "pm25_corr": 0.08985200845665962,
+      "pm25_best": 0.0,
+      "pm25_corr": 0.0,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_Entwistle2(AQSU-858E)",
@@ -20,9 +20,9 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1776705659,
-      "last_seen_iso_utc": "2026-04-20T17:20:59+00:00",
-      "humidity": 32,
+      "last_seen": 1776707219,
+      "last_seen_iso_utc": "2026-04-20T17:46:59+00:00",
+      "humidity": 31,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -37,9 +37,9 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1776705727,
-      "last_seen_iso_utc": "2026-04-20T17:22:07+00:00",
-      "humidity": 34,
+      "last_seen": 1776707167,
+      "last_seen_iso_utc": "2026-04-20T17:46:07+00:00",
+      "humidity": 32,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -54,9 +54,9 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1776705689,
-      "last_seen_iso_utc": "2026-04-20T17:21:29+00:00",
-      "humidity": 27,
+      "last_seen": 1776707129,
+      "last_seen_iso_utc": "2026-04-20T17:45:29+00:00",
+      "humidity": 28,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -79,8 +79,8 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 0.022463002114164906,
-    "color_hex": "#01cbff",
+    "used_pm25_corr": 0.0,
+    "color_hex": "#D3D3D3",
     "duration_sec": 60
   }
 }
