@@ -1,11 +1,11 @@
 {
-  "generated_at_utc": "2026-05-11T23:47:05.063307+00:00",
+  "generated_at_utc": "2026-05-12T00:31:16.073752+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1778543157,
-      "last_seen_iso_utc": "2026-05-11T23:45:57+00:00",
-      "humidity": 19,
+      "last_seen": 1778545797,
+      "last_seen_iso_utc": "2026-05-12T00:29:57+00:00",
+      "humidity": 18,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -20,9 +20,9 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1778543101,
-      "last_seen_iso_utc": "2026-05-11T23:45:01+00:00",
-      "humidity": 19,
+      "last_seen": 1778545741,
+      "last_seen_iso_utc": "2026-05-12T00:29:01+00:00",
+      "humidity": 18,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -37,8 +37,8 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1778543108,
-      "last_seen_iso_utc": "2026-05-11T23:45:08+00:00",
+      "last_seen": 1778545748,
+      "last_seen_iso_utc": "2026-05-12T00:29:08+00:00",
       "humidity": 17,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
@@ -54,8 +54,8 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1778543001,
-      "last_seen_iso_utc": "2026-05-11T23:43:21+00:00",
+      "last_seen": 1778545761,
+      "last_seen_iso_utc": "2026-05-12T00:29:21+00:00",
       "humidity": 18,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
