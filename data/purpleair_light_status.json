@@ -1,16 +1,16 @@
 {
-  "generated_at_utc": "2026-06-06T23:49:46.281367+00:00",
+  "generated_at_utc": "2026-06-07T00:39:53.963729+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1780789723,
-      "last_seen_iso_utc": "2026-06-06T23:48:43+00:00",
-      "humidity": 21,
-      "pm25_atm": 0.1,
+      "last_seen": 1780792723,
+      "last_seen_iso_utc": "2026-06-07T00:38:43+00:00",
+      "humidity": 18,
+      "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
-      "pm25_atm_b": 0.1,
-      "pm25_best": 0.1,
-      "pm25_corr": 0.0906735751295337,
+      "pm25_atm_b": 0.0,
+      "pm25_best": 0.0,
+      "pm25_corr": 0.0,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_Entwistle2(AQSU-858E)",
@@ -20,9 +20,9 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1780789729,
-      "last_seen_iso_utc": "2026-06-06T23:48:49+00:00",
-      "humidity": 21,
+      "last_seen": 1780792730,
+      "last_seen_iso_utc": "2026-06-07T00:38:50+00:00",
+      "humidity": 20,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -37,9 +37,9 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1780789756,
-      "last_seen_iso_utc": "2026-06-06T23:49:16+00:00",
-      "humidity": 18,
+      "last_seen": 1780792756,
+      "last_seen_iso_utc": "2026-06-07T00:39:16+00:00",
+      "humidity": 17,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -54,9 +54,9 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1780789758,
-      "last_seen_iso_utc": "2026-06-06T23:49:18+00:00",
-      "humidity": 18,
+      "last_seen": 1780792758,
+      "last_seen_iso_utc": "2026-06-07T00:39:18+00:00",
+      "humidity": 17,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -79,8 +79,8 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 0.022668393782383424,
-    "color_hex": "#01cbff",
+    "used_pm25_corr": 0.0,
+    "color_hex": "#D3D3D3",
     "duration_sec": 60
   }
 }
