@@ -1,16 +1,16 @@
 {
-  "generated_at_utc": "2026-06-07T17:29:08.080685+00:00",
+  "generated_at_utc": "2026-06-07T17:55:11.845099+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1780853332,
-      "last_seen_iso_utc": "2026-06-07T17:28:52+00:00",
-      "humidity": 45,
-      "pm25_atm": 0.3,
-      "pm25_atm_a": 0.3,
-      "pm25_atm_b": 0.3,
-      "pm25_best": 0.3,
-      "pm25_corr": 0.2507598784194529,
+      "last_seen": 1780854775,
+      "last_seen_iso_utc": "2026-06-07T17:52:55+00:00",
+      "humidity": 43,
+      "pm25_atm": 9.7,
+      "pm25_atm_a": 7.7,
+      "pm25_atm_b": 11.6,
+      "pm25_best": 9.7,
+      "pm25_corr": 8.21301247771836,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_Entwistle2(AQSU-858E)",
@@ -20,9 +20,9 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1780853220,
-      "last_seen_iso_utc": "2026-06-07T17:27:00+00:00",
-      "humidity": 43,
+      "last_seen": 1780854781,
+      "last_seen_iso_utc": "2026-06-07T17:53:01+00:00",
+      "humidity": 42,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -37,9 +37,9 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1780853246,
-      "last_seen_iso_utc": "2026-06-07T17:27:26+00:00",
-      "humidity": 42,
+      "last_seen": 1780854806,
+      "last_seen_iso_utc": "2026-06-07T17:53:26+00:00",
+      "humidity": 41,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -54,9 +54,9 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1780853254,
-      "last_seen_iso_utc": "2026-06-07T17:27:34+00:00",
-      "humidity": 49,
+      "last_seen": 1780854809,
+      "last_seen_iso_utc": "2026-06-07T17:53:29+00:00",
+      "humidity": 47,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -79,7 +79,7 @@
       166965,
       249949
     ],
-    "used_pm25_corr": 0.06268996960486323,
+    "used_pm25_corr": 2.05325311942959,
     "color_hex": "#01cbff",
     "duration_sec": 60
   }
