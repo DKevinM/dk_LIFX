@@ -446,12 +446,18 @@ def main():
     ]
 
     if not usable:
-        print("No fresh valid PurpleAir data; not changing light.")
+        stale_color = "#D3D3D3"  # grey = data stale/unavailable, not "safe"
+        print("No fresh valid PurpleAir data; setting light to grey (stale).")
+        try:
+            set_lifx_color(stale_color)
+        except Exception as e:
+            print(f"Warning: failed to set stale-data fallback color: {e}")
+
         payload = build_status_payload(
             sensors_data=sensors_status,
             used_sensor_indices=[],
             used_pm25_corr=None,
-            used_color_hex=None,
+            used_color_hex=stale_color,
             strategy="none_available",
         )
         write_status_json(payload)

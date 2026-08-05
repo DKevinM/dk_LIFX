@@ -479,18 +479,18 @@
       try {
         const resp = await fetch("data/purpleair_light_status.json?cb=" + Date.now());
         if (!resp.ok) {
-            const props = {
-              generatedAtLocal,
-              avgPm,
-              nSensors,
-              lat,
-              lon
+          console.error("Failed to fetch JSON:", resp.status, await resp.text());
+
+          const props = {
+            generatedAtLocal: "(error loading data)",
+            avgPm: null,
+            nSensors: 0,
+            lat: null,
+            lon: null
           };
-        
+
           window.latestInfoProps = props;
           info.update(props);
-        
-          console.error("Failed to fetch JSON:", resp.status, await resp.text());
           return;
         }
 
