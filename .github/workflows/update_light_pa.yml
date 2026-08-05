@@ -50,11 +50,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Only add/commit if the JSON actually changed
-          if git status --porcelain data/purpleair_light_status.json | grep .; then
-            git add data/purpleair_light_status.json
-            git commit -m "Update PurpleAir light status JSON [skip ci]"
+          # Only add/commit if tracked outputs actually changed
+          if git status --porcelain data/purpleair_light_status.json data/aqhi_comparison_log.csv | grep .; then
+            git add data/purpleair_light_status.json data/aqhi_comparison_log.csv
+            git commit -m "Update PurpleAir light status + AQHI comparison log [skip ci]"
             git push
           else
-            echo "No changes to JSON; nothing to commit."
+            echo "No changes to commit."
           fi

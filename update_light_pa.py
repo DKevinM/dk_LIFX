@@ -3,6 +3,7 @@ import time
 import json
 import math
 import csv
+import colorsys
 from datetime import datetime, timedelta, timezone
 
 import requests
@@ -25,8 +26,28 @@ LIFX_DURATION_SEC = 60
 # Output JSON file (for map / phone app)
 STATUS_JSON_PATH = os.path.join("data", "purpleair_light_status.json")
 
+# Running estimate-vs-official AQHI comparison log (appended to every run)
+COMPARISON_LOG_PATH = os.path.join("data", "aqhi_comparison_log.csv")
+
+# Source of official station AQHI readings (same feed index.html's map compares against)
+AQHI_STATIONS_CSV_URL = "https://raw.githubusercontent.com/DKevinM/AB_datapull/main/data/last6h.csv"
+
 # Consider data "fresh" if last_seen is within this many minutes
 MAX_AGE_MINUTES = 30
+
+# Estimate-vs-official agreement thresholds, in AQHI category points.
+# |diff| <= HIGH  -> "high" confidence (estimate and official are in/near the same band)
+# |diff| <= MEDIUM -> "medium" confidence
+# otherwise         -> "low" confidence (system is telling you it disagrees with itself)
+CONFIDENCE_HIGH_MAX_DIFF = 1
+CONFIDENCE_MEDIUM_MAX_DIFF = 2
+
+# When confidence is "low", dim/desaturate the displayed color instead of
+# showing it at full strength (rather than blinking, which can read as an
+# alarm). These are starting points — tune once seen in person.
+LOW_CONFIDENCE_SATURATION_FACTOR = 0.35
+LOW_CONFIDENCE_BRIGHTNESS_FACTOR = 0.55
+LOW_CONFIDENCE_MIN_BRIGHTNESS = 0.15
 
 # ================================================================
 
@@ -214,6 +235,236 @@ def load_sensor_metadata(sensor_ids):
 
 
 
+
+# ---------- Official AQHI comparison (ported from index.html) -----
+
+def fetch_aqhi_stations(url=AQHI_STATIONS_CSV_URL):
+    """
+    Pull the latest official AQHI reading per station from the same
+    last6h.csv feed the map page (index.html) compares against.
+
+    Rows in that feed use a blank ParameterName to mean "this row is AQHI"
+    (see index.html's fetchAQHIStations for the original JS version).
+    """
+    try:
+        resp = requests.get(url, timeout=20)
+        resp.raise_for_status()
+    except Exception as e:
+        print(f"Warning: could not fetch AQHI stations CSV: {e}")
+        return []
+
+    reader = csv.DictReader(resp.text.splitlines())
+
+    latest_by_station = {}
+    for row in reader:
+        param = (row.get("ParameterName") or "").strip()
+        if param != "":
+            continue  # AQHI rows only
+
+        station = row.get("StationName")
+        val = _safe_float(row.get("Value"))
+        lat = _safe_float(row.get("Latitude"))
+        lon = _safe_float(row.get("Longitude"))
+        date_str = row.get("ReadingDate")
+
+        if not station or val is None or lat is None or lon is None:
+            continue
+
+        try:
+            ts = datetime.fromisoformat(date_str)
+        except (TypeError, ValueError):
+            continue
+
+        existing = latest_by_station.get(station)
+        if existing is None or ts > existing["time"]:
+            latest_by_station[station] = {
+                "station": station,
+                "lat": lat,
+                "lon": lon,
+                "value": val,
+                "time": ts,
+            }
+
+    return list(latest_by_station.values())
+
+
+def haversine_km(lat1, lon1, lat2, lon2):
+    r = 6371.0
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = math.sin(dlat / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dlon / 2) ** 2
+    return 2 * r * math.asin(math.sqrt(a))
+
+
+def get_three_closest_aqhi(stations, lat, lon):
+    """
+    Distance-weighted (inverse-distance) average AQHI across the 3 closest
+    official stations, rounded up — matches getThreeClosestAQHI() in index.html.
+    """
+    if lat is None or lon is None or not stations:
+        return None
+
+    with_dist = [
+        {**s, "distance": haversine_km(lat, lon, s["lat"], s["lon"])}
+        for s in stations
+    ]
+    with_dist.sort(key=lambda s: s["distance"])
+    closest3 = with_dist[:3]
+    if not closest3:
+        return None
+
+    weighted_sum = 0.0
+    weight_total = 0.0
+    for s in closest3:
+        w = 1.0 / max(s["distance"], 0.1)
+        weighted_sum += s["value"] * w
+        weight_total += w
+
+    avg = weighted_sum / weight_total
+    return {"stations": closest3, "avg": avg, "rounded": math.ceil(avg)}
+
+
+def estimate_aqhi_from_pm25(pm25_corr):
+    """Mirrors index.html's estAQHI: floor(avgPm / 10) + 1 (uncapped here)."""
+    return math.floor(pm25_corr / 10) + 1
+
+
+def classify_confidence(estimated_aqhi, official_rounded):
+    """
+    Confidence that the displayed signal reflects reality, based on how far the
+    PurpleAir-derived estimate diverges from the 3-closest-station official AQHI.
+
+    Returns "unknown" when there's nothing to compare against (no nearby
+    official stations, or no site location) rather than defaulting to "high" —
+    absence of a check is not the same as agreement.
+    """
+    if estimated_aqhi is None or official_rounded is None:
+        return "unknown"
+
+    diff = abs(estimated_aqhi - official_rounded)
+    if diff <= CONFIDENCE_HIGH_MAX_DIFF:
+        return "high"
+    if diff <= CONFIDENCE_MEDIUM_MAX_DIFF:
+        return "medium"
+    return "low"
+
+
+def hex_to_hsb(hex_color):
+    h = hex_color.lstrip("#")
+    r, g, b = (int(h[i:i + 2], 16) / 255.0 for i in (0, 2, 4))
+    hue, sat, val = colorsys.rgb_to_hsv(r, g, b)
+    return hue * 360.0, sat, val
+
+
+def apply_confidence_dimming(color_hex, confidence):
+    """
+    When the PurpleAir-derived estimate disagrees with the 3-closest official
+    stations (confidence == "low"), dim and desaturate the eAQHI category
+    color instead of displaying it at full strength — a physical "I'm not
+    sure about this" cue on a bulb that only has one color to give. Color is
+    left untouched for "high"/"medium"/"unknown" confidence.
+
+    Returns a LIFX structured color string ("hue:.. saturation:.. brightness:..")
+    when dimming is applied, or the original hex string unchanged otherwise.
+    """
+    if confidence != "low":
+        return color_hex
+
+    hue, sat, val = hex_to_hsb(color_hex)
+    new_sat = max(0.0, sat * LOW_CONFIDENCE_SATURATION_FACTOR)
+    new_val = max(LOW_CONFIDENCE_MIN_BRIGHTNESS, val * LOW_CONFIDENCE_BRIGHTNESS_FACTOR)
+    return f"hue:{hue:.1f} saturation:{new_sat:.3f} brightness:{new_val:.3f}"
+
+
+def compute_site_centroid(sensors):
+    """Average lat/lon of the sensors actually used, as a stand-in site location."""
+    lats = [s.get("latitude") for s in sensors if s.get("latitude") is not None]
+    lons = [s.get("longitude") for s in sensors if s.get("longitude") is not None]
+    if not lats or not lons:
+        return None, None
+    return sum(lats) / len(lats), sum(lons) / len(lons)
+
+
+COMPARISON_LOG_FIELDS = [
+    "timestamp_utc",
+    "n_sensors_used",
+    "used_sensor_indices",
+    "pm25_corr_avg",
+    "estimated_aqhi",
+    "site_lat",
+    "site_lon",
+    "station1_name", "station1_km", "station1_aqhi",
+    "station2_name", "station2_km", "station2_aqhi",
+    "station3_name", "station3_km", "station3_aqhi",
+    "official_weighted_avg",
+    "official_rounded",
+    "diff_estimated_minus_official",
+    "confidence",
+]
+
+
+def append_comparison_row(row, path=COMPARISON_LOG_PATH):
+    """Append one row to the running comparison CSV, writing the header once."""
+    dir_name = os.path.dirname(path)
+    if dir_name:
+        os.makedirs(dir_name, exist_ok=True)
+
+    file_exists = os.path.isfile(path)
+    try:
+        with open(path, "a", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=COMPARISON_LOG_FIELDS)
+            if not file_exists:
+                writer.writeheader()
+            writer.writerow(row)
+        print(f"Appended comparison row to {path}")
+    except Exception as e:
+        print(f"Warning: failed to append comparison row: {e}")
+
+
+def build_comparison_row(usable, used_sensor_indices, avg_pm25_corr):
+    site_lat, site_lon = compute_site_centroid(usable)
+    estimated_aqhi = estimate_aqhi_from_pm25(avg_pm25_corr)
+
+    aqhi_stations = fetch_aqhi_stations()
+    aqhi_compare = get_three_closest_aqhi(aqhi_stations, site_lat, site_lon)
+
+    row = {
+        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+        "n_sensors_used": len(usable),
+        "used_sensor_indices": ";".join(str(i) for i in used_sensor_indices),
+        "pm25_corr_avg": round(avg_pm25_corr, 2),
+        "estimated_aqhi": estimated_aqhi,
+        "site_lat": site_lat,
+        "site_lon": site_lon,
+    }
+
+    for i in range(3):
+        prefix = f"station{i + 1}"
+        if aqhi_compare and i < len(aqhi_compare["stations"]):
+            s = aqhi_compare["stations"][i]
+            row[f"{prefix}_name"] = s["station"]
+            row[f"{prefix}_km"] = round(s["distance"], 2)
+            row[f"{prefix}_aqhi"] = s["value"]
+        else:
+            row[f"{prefix}_name"] = None
+            row[f"{prefix}_km"] = None
+            row[f"{prefix}_aqhi"] = None
+
+    if aqhi_compare:
+        row["official_weighted_avg"] = round(aqhi_compare["avg"], 2)
+        row["official_rounded"] = aqhi_compare["rounded"]
+        row["diff_estimated_minus_official"] = estimated_aqhi - aqhi_compare["rounded"]
+        row["confidence"] = classify_confidence(estimated_aqhi, aqhi_compare["rounded"])
+    else:
+        row["official_weighted_avg"] = None
+        row["official_rounded"] = None
+        row["diff_estimated_minus_official"] = None
+        row["confidence"] = "unknown"
+
+    return row
+
+
 def fetch_purpleair_current_multi(sensor_ids, overrides, max_age_minutes=30):
     """
     Call PurpleAir /v1/sensors once for all sensor_ids using show_only.
@@ -359,12 +610,15 @@ def build_status_payload(
     used_pm25_corr,
     used_color_hex,
     strategy: str,
+    comparison=None,
 ):
     """
     Build a JSON-serializable dict describing the current status.
     sensors_data: list of dicts from fetch_purpleair_current_multi().
     used_sensor_indices: list of sensor_index values that contributed to the light color
     strategy: e.g. "average_fresh_sensors" or "none_available"
+    comparison: optional row from build_comparison_row(), surfaces estimate-vs-official
+        agreement (and "confidence") to consumers of the JSON, e.g. the map page.
     """
     now_utc = datetime.now(timezone.utc).isoformat()
 
@@ -379,6 +633,7 @@ def build_status_payload(
             "color_hex": used_color_hex,
             "duration_sec": LIFX_DURATION_SEC,
         },
+        "comparison": comparison,
     }
     return payload
 
@@ -476,10 +731,21 @@ def main():
         f"Using {len(usable)} sensors {used_sensor_indices}: "
         f"avg_corrected={avg_pm25_corr:.2f}, color={color}"
     )
-  
 
-    # 3) Set the LIFX bulb color
-    set_lifx_color(color)
+    # 2b) Compare against the 3 closest official AQHI stations and log it
+    comparison_row = build_comparison_row(usable, used_sensor_indices, avg_pm25_corr)
+    append_comparison_row(comparison_row)
+    print(
+        f"Estimated AQHI={comparison_row['estimated_aqhi']} vs "
+        f"official (3-closest, weighted)={comparison_row['official_rounded']} "
+        f"-> confidence={comparison_row['confidence']}"
+    )
+
+    # 3) Set the LIFX bulb color — dimmed/desaturated if confidence is low
+    lifx_command_color = apply_confidence_dimming(color, comparison_row["confidence"])
+    if lifx_command_color != color:
+        print(f"Low confidence: dimming bulb command to '{lifx_command_color}'")
+    set_lifx_color(lifx_command_color)
     print("LIFX color updated.")
 
     # 4) Write status JSON for mapping / phone use
@@ -489,7 +755,11 @@ def main():
         used_pm25_corr=avg_pm25_corr,
         used_color_hex=color,
         strategy="average_fresh_sensors",
+        comparison=comparison_row,
     )
+    payload["light"]["color_hex_category"] = color
+    payload["light"]["lifx_command_sent"] = lifx_command_color
+    payload["light"]["confidence"] = comparison_row["confidence"]
     write_status_json(payload)
 
 
