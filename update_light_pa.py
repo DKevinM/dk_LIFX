@@ -42,6 +42,18 @@ MAX_AGE_MINUTES = 30
 CONFIDENCE_HIGH_MAX_DIFF = 1
 CONFIDENCE_MEDIUM_MAX_DIFF = 2
 
+# Cross-sensor consensus check thresholds (ug/m3). A sensor reading is
+# rejected as a likely-fouled outlier only if it clears BOTH gates: a
+# meaningful absolute gap (so noise at low concentrations never trips
+# this) AND a large multiple of the group median (so a real, sustained
+# regional event - where every sensor rises together - never does either,
+# since the median rises right along with them). Picked from confirmed
+# cases 2026-09-01: sensor 83971 hit 239 and 425 while its 3 neighbors
+# (within ~1km) sat under 20 - ratios of 19x and 129x - while genuine
+# multi-sensor-confirmed events that day topped out under 1.4x.
+OUTLIER_MIN_ABS_DIFF = 30.0
+OUTLIER_MEDIAN_RATIO = 3.0
+
 # When confidence is "low", dim/desaturate the displayed color instead of
 # showing it at full strength (rather than blinking, which can read as an
 # alarm). These are starting points — tune once seen in person.
@@ -159,6 +171,49 @@ def get_pa_color(pm25_corr: float) -> str:
     elif v > 0: return "#01cbff"  #eAQHI 1
     else: return "#D3D3D3"
 
+
+def reject_outlier_sensors(usable):
+    """Cross-sensor consensus check: a single sensor reading far above its
+    neighbors gets excluded before averaging, rather than dragging a
+    false reading into both the light color and the comparison log.
+
+    This is a DIFFERENT check than choose_pm_and_method() above, which
+    only compares one sensor's own two internal channels (A/B) against
+    each other. Physical fouling (dust, spider webs in the optical
+    chamber - confirmed 2026-09-01 for sensor 83971, which hit 239 and
+    425 ug/m3 twice while its 3 neighbors within ~1km stayed under 20)
+    typically contaminates both of a sensor's channels together, so
+    choose_pm_and_method() sees two channels agreeing and has nothing to
+    flag. This check compares sensors against EACH OTHER instead.
+
+    Needs >=3 sensors to have a meaningful consensus to check against -
+    with 1-2 there's no way to tell who's actually wrong, so nothing is
+    rejected. Returns (kept, rejected) where rejected is a list of
+    (sensor, value) pairs for logging.
+    """
+    if len(usable) < 3:
+        return usable, []
+
+    vals = sorted(float(s["pm25_corr"]) for s in usable)
+    n = len(vals)
+    median = vals[n // 2] if n % 2 else (vals[n // 2 - 1] + vals[n // 2]) / 2
+
+    kept, rejected = [], []
+    for s in usable:
+        v = float(s["pm25_corr"])
+        threshold = max(OUTLIER_MIN_ABS_DIFF, OUTLIER_MEDIAN_RATIO * median)
+        if abs(v - median) > threshold:
+            rejected.append((s, v))
+        else:
+            kept.append(s)
+
+    # If rejecting outliers would leave fewer than 2 sensors, the
+    # "consensus" itself is too thin to trust - fall back to using
+    # everyone rather than guess which minority is actually wrong.
+    if len(kept) < 2:
+        return usable, []
+
+    return kept, rejected
 
 
 def _safe_float(x):
@@ -717,6 +772,14 @@ def main():
         )
         write_status_json(payload)
         return
+
+    usable, rejected_outliers = reject_outlier_sensors(usable)
+    for s, v in rejected_outliers:
+        print(
+            f"Excluding sensor {s.get('sensor_index')} as an outlier: "
+            f"{v:.1f} ug/m3 vs group median (suspected fouling - spider "
+            f"web/dust in the optical chamber)"
+        )
 
     used_sensor_indices = [
         int(s["sensor_index"]) for s in usable
