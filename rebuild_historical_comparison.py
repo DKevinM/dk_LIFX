@@ -2,15 +2,22 @@
 rebuild_historical_comparison.py
 
 One-off rebuild of the PurpleAir-vs-official-AQHI comparison log, going
-back as far as both data sources actually allow (requested 2026-09-01):
+back as far as both data sources actually allow.
 - PurpleAir hourly readings (Supabase sensor_readings): 3 of the 4
   sensors go back to 2025-01-01; the 4th (249949) starts 2026-01-27.
-- Official AQHI (government OData API): hard 365-day rolling retention,
-  confirmed empirically - nothing before ~2025-09-01 is queryable at all.
+- Official AQHI: originally pulled from the government's live OData API,
+  which has a hard 365-day rolling retention (confirmed empirically -
+  nothing before ~2025-09-01 was queryable there). Switched 2026-09-01
+  to Supabase's own `aqhi_data` table instead, which - since the raw-to-
+  QA'd "exchange" step referenced in project notes was never built, so
+  nothing has ever been purged - already holds the full history back to
+  2025-01-01 for all 3 comparison stations. Note this means it's still
+  the same raw/provisional data, not retroactively QA'd; the two known-
+  bad Genesee readings (Oct 22 + Dec 19 2025) are expected to still be
+  in it.
 
-So 2025-09-01 is the real start of usable overlap, not 2025-01-01 - the
-government side is the limiting factor. Requested cadence is hourly (the
-live script runs every ~25-30min; this only needs one row per hour).
+Requested cadence is hourly (the live script runs every ~25-30min; this
+only needs one row per hour).
 
 Reproduces update_light_pa.py's comparison logic exactly:
 - estimated_aqhi = floor(pm25_corrected_avg / 10) + 1
@@ -36,7 +43,7 @@ SENSOR_IDS = [83971, 91545, 166965, 249949]
 STATIONS = ["Drayton Valley", "Genesee", "Enoch"]
 MEAS_URL = "https://data.environment.alberta.ca/EdwServices/aqhi/odata/StationMeasurements"
 
-START = datetime(2025, 9, 1, tzinfo=timezone.utc)
+START = datetime(2025, 1, 1, tzinfo=timezone.utc)
 END = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
 
 OUT_PATH = "data/aqhi_comparison_log_rebuilt.csv"
@@ -79,35 +86,40 @@ def fetch_sensor_readings(sensor_id):
 
 
 def fetch_station_aqhi(station_name):
-    """Page through the government API for one station's AQHI (blank
-    ParameterName) history, full range."""
+    """Page through Supabase's aqhi_data table for one station's AQHI
+    history, full range. Switched from the government OData API
+    2026-09-01 - that API's hard 365-day retention capped history at
+    ~2025-09-01; aqhi_data holds everything back to 2025-01-01 since
+    nothing has ever been purged from it (see module docstring)."""
     rows = []
-    # The server hard-caps $top at 5000 with NO @odata.nextLink at all -
-    # confirmed empirically (a full-year query silently truncated to the
-    # first 5000 hours, ~mid-March 2026, with no signal it had done so).
-    # $skip does work though, so page manually instead of trusting nextLink.
-    filter_clause = (
-        f"StationName eq '{station_name}' and ParameterName eq null "
-        f"and ReadingDate ge {START.strftime('%Y-%m-%dT%H:%M:%SZ')} "
-        f"and ReadingDate le {END.strftime('%Y-%m-%dT%H:%M:%SZ')}"
-    )
-    page_size = 5000
-    skip = 0
+    headers = {
+        "apikey": SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+    }
+    # PostgREST caps responses at 1000 rows regardless of the requested
+    # limit - confirmed empirically (offset=1000 still returned more real
+    # data). Matching the real cap here so the "last page" check below
+    # actually triggers correctly, unlike a naive limit=5000 which looks
+    # like a full last page every single time.
+    page_size = 1000
+    offset = 0
     while True:
         params = {
-            "$filter": filter_clause,
-            "$select": "StationName,Value,ReadingDate",
-            "$orderby": "ReadingDate asc",
-            "$top": str(page_size),
-            "$skip": str(skip),
+            "StationName": f"eq.{station_name}",
+            "ParameterName": "eq.AQHI",
+            "ReadingDate": [f"gte.{START.isoformat()}", f"lte.{END.isoformat()}"],
+            "select": "StationName,Value,ReadingDate",
+            "order": "ReadingDate.asc",
+            "limit": str(page_size),
+            "offset": str(offset),
         }
-        r = requests.get(MEAS_URL, params=params, timeout=30)
+        r = requests.get(f"{SUPABASE_URL}/rest/v1/aqhi_data", headers=headers, params=params, timeout=30)
         r.raise_for_status()
-        batch = r.json().get("value", [])
+        batch = r.json()
         rows.extend(batch)
         if len(batch) < page_size:
             break
-        skip += page_size
+        offset += page_size
     df = pd.DataFrame(rows)
     if df.empty:
         return df
