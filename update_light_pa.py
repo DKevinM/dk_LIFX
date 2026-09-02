@@ -42,6 +42,26 @@ MAX_AGE_MINUTES = 30
 CONFIDENCE_HIGH_MAX_DIFF = 1
 CONFIDENCE_MEDIUM_MAX_DIFF = 2
 
+# Seasonal bias correction, in AQHI points to ADD to the raw PM2.5-only
+# estimate (estimate_aqhi_from_pm25). The raw estimate structurally
+# under-calls AQHI because it can't see O3/NO2, worst in winter/spring
+# when boundary-layer inversions trap NO2 near the surface.
+#
+# Fit 2026-09-02 from 8 independently CO-LOCATED (<0.6km, most <0.06km)
+# PurpleAir/official-AQHI-station pairs elsewhere in Alberta - NOT from
+# this site's own (42-82km-distant) comparison data, specifically so the
+# correction reflects the estimator's general behavior rather than being
+# curve-fit to this deployment. Cross-checked against this site's own
+# 2026 out-of-sample history and found equally effective there (within-1
+# agreement 66.3% raw -> 85.4% corrected, matching a same-site self-fit
+# correction almost exactly) - see white paper Section 5.4.
+# Woodcroft excluded from the fit: its official reference is a TEOM
+# instrument, not trusted for AQHI, per Kevin.
+MONTHLY_AQHI_CORRECTION = {
+    1: 1.07, 2: 1.19, 3: 1.08, 4: 1.34, 5: 1.26, 6: 0.69,
+    7: 0.58, 8: 0.54, 9: 0.27, 10: 0.65, 11: 0.57, 12: 0.65,
+}
+
 # Cross-sensor consensus check thresholds (ug/m3). A sensor reading is
 # rejected as a likely-fouled outlier only if it clears BOTH gates: a
 # meaningful absolute gap (so noise at low concentrations never trips
@@ -170,6 +190,39 @@ def get_pa_color(pm25_corr: float) -> str:
     elif v > 10: return "#0099cb" #eAQHI 2
     elif v > 0: return "#01cbff"  #eAQHI 1
     else: return "#D3D3D3"
+
+
+AQHI_BAND_COLORS = {
+    1: "#01cbff", 2: "#0099cb", 3: "#016797", 4: "#fffe03", 5: "#ffcb00",
+    6: "#ff9835", 7: "#fd6866", 8: "#fe0002", 9: "#cc0001", 10: "#9a0100",
+}
+
+
+def get_color_for_aqhi(aqhi) -> str:
+    """Same eAQHI colour bands as get_pa_color(), keyed directly by an
+    already-computed AQHI value rather than a raw PM2.5 threshold - used
+    for the seasonally-corrected estimate (apply_seasonal_correction),
+    since that correction is applied at the AQHI level, not the PM2.5
+    level, and reversing it back into a PM2.5-equivalent to feed
+    get_pa_color() would be an unnecessary round trip.
+
+    Uses standard rounding (nearest, not ceiling) deliberately: the
+    correction's validated accuracy (white paper Section 5.4) was
+    measured as |continuous_corrected_value - official| <= 1, not
+    against a further-rounded-up version of the corrected value.
+    Ceiling here would silently add up to another full point on top of
+    the fitted correction for most fractional offsets, which was never
+    what was tested."""
+    try:
+        v = float(aqhi)
+    except (TypeError, ValueError):
+        return "#D3D3D3"
+    if v <= 0:
+        return "#D3D3D3"
+    if v > 10.5:
+        return "#640100"  # eAQHI 10+
+    band = max(1, min(10, round(v)))
+    return AQHI_BAND_COLORS[band]
 
 
 def reject_outlier_sensors(usable):
@@ -385,6 +438,22 @@ def estimate_aqhi_from_pm25(pm25_corr):
     return math.floor(pm25_corr / 10) + 1
 
 
+def apply_seasonal_correction(estimated_aqhi, when=None):
+    """Add this calendar month's correction offset (MONTHLY_AQHI_CORRECTION)
+    to the raw PM2.5-only estimate. Deliberately NOT capped at 10 here -
+    that cap was applied on both sides for fair comparison purposes when
+    validating this correction (white paper Section 5.4), but capping it
+    here would collapse the "10" vs "10+" colour distinction that
+    get_pa_color() already preserves for raw readings above 100 ug/m3.
+    `when` defaults to now (UTC) - the backtest this was validated
+    against used the UTC timestamp's month directly (not localized to
+    Alberta time first), so this matches that exactly rather than
+    introducing a subtle month-boundary mismatch."""
+    ts = when or datetime.now(timezone.utc)
+    offset = MONTHLY_AQHI_CORRECTION.get(ts.month, 0.0)
+    return estimated_aqhi + offset
+
+
 def classify_confidence(estimated_aqhi, official_rounded):
     """
     Confidence that the displayed signal reflects reality, based on how far the
@@ -447,6 +516,7 @@ COMPARISON_LOG_FIELDS = [
     "used_sensor_indices",
     "pm25_corr_avg",
     "estimated_aqhi",
+    "estimated_aqhi_corrected",
     "site_lat",
     "site_lon",
     "station1_name", "station1_km", "station1_aqhi",
@@ -480,6 +550,7 @@ def append_comparison_row(row, path=COMPARISON_LOG_PATH):
 def build_comparison_row(usable, used_sensor_indices, avg_pm25_corr):
     site_lat, site_lon = compute_site_centroid(usable)
     estimated_aqhi = estimate_aqhi_from_pm25(avg_pm25_corr)
+    estimated_aqhi_corrected = apply_seasonal_correction(estimated_aqhi)
 
     aqhi_stations = fetch_aqhi_stations()
     aqhi_compare = get_three_closest_aqhi(aqhi_stations, site_lat, site_lon)
@@ -490,6 +561,7 @@ def build_comparison_row(usable, used_sensor_indices, avg_pm25_corr):
         "used_sensor_indices": ";".join(str(i) for i in used_sensor_indices),
         "pm25_corr_avg": round(avg_pm25_corr, 2),
         "estimated_aqhi": estimated_aqhi,
+        "estimated_aqhi_corrected": round(estimated_aqhi_corrected, 2),
         "site_lat": site_lat,
         "site_lon": site_lon,
     }
@@ -506,11 +578,15 @@ def build_comparison_row(usable, used_sensor_indices, avg_pm25_corr):
             row[f"{prefix}_km"] = None
             row[f"{prefix}_aqhi"] = None
 
+    # Confidence/diff are computed against the CORRECTED estimate, since
+    # that's what's actually driving the bulb colour now (see main()) -
+    # confidence should reflect the accuracy of what's displayed, not of
+    # an intermediate value nothing downstream uses anymore.
     if aqhi_compare:
         row["official_weighted_avg"] = round(aqhi_compare["avg"], 2)
         row["official_rounded"] = aqhi_compare["rounded"]
-        row["diff_estimated_minus_official"] = estimated_aqhi - aqhi_compare["rounded"]
-        row["confidence"] = classify_confidence(estimated_aqhi, aqhi_compare["rounded"])
+        row["diff_estimated_minus_official"] = round(estimated_aqhi_corrected - aqhi_compare["rounded"], 2)
+        row["confidence"] = classify_confidence(estimated_aqhi_corrected, aqhi_compare["rounded"])
     else:
         row["official_weighted_avg"] = None
         row["official_rounded"] = None
@@ -788,20 +864,24 @@ def main():
     pm_vals = [float(s["pm25_corr"]) for s in usable]
     avg_pm25_corr = sum(pm_vals) / len(pm_vals)
 
-    color = get_pa_color(avg_pm25_corr)
+    # 2b) Compare against the 3 closest official AQHI stations and log it.
+    # Done before choosing the bulb colour now, since the colour is driven
+    # by the seasonally-corrected estimate this computes (Section 5.4),
+    # not the raw PM2.5-only value.
+    comparison_row = build_comparison_row(usable, used_sensor_indices, avg_pm25_corr)
+    append_comparison_row(comparison_row)
+    print(
+        f"Estimated AQHI={comparison_row['estimated_aqhi']} "
+        f"(seasonally corrected: {comparison_row['estimated_aqhi_corrected']}) vs "
+        f"official (3-closest, weighted)={comparison_row['official_rounded']} "
+        f"-> confidence={comparison_row['confidence']}"
+    )
+
+    color = get_color_for_aqhi(comparison_row["estimated_aqhi_corrected"])
 
     print(
         f"Using {len(usable)} sensors {used_sensor_indices}: "
         f"avg_corrected={avg_pm25_corr:.2f}, color={color}"
-    )
-
-    # 2b) Compare against the 3 closest official AQHI stations and log it
-    comparison_row = build_comparison_row(usable, used_sensor_indices, avg_pm25_corr)
-    append_comparison_row(comparison_row)
-    print(
-        f"Estimated AQHI={comparison_row['estimated_aqhi']} vs "
-        f"official (3-closest, weighted)={comparison_row['official_rounded']} "
-        f"-> confidence={comparison_row['confidence']}"
     )
 
     # 3) Set the LIFX bulb color — dimmed/desaturated if confidence is low
