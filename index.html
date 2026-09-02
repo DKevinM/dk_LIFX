@@ -364,15 +364,28 @@
         }
       
         // ---------- DATA AVAILABLE ----------
-        const { generatedAtLocal, avgPm, nSensors, lat, lon } = props;
-      
+        const { generatedAtLocal, avgPm, correctedAqhi, colorHex, nSensors, lat, lon } = props;
+
         const hasAvg = typeof avgPm === "number";
-        const boxColor = hasAvg ? pmToColor(avgPm) : "#9CA3AF";
-      
+        const hasCorrected = typeof correctedAqhi === "number" && !isNaN(correctedAqhi);
+
+        // Prefer the server-computed, seasonally-corrected values
+        // (comparison.estimated_aqhi_corrected / light.color_hex_category)
+        // - this is what the physical bulb is actually showing. Fall back
+        // to the old raw-PM2.5-only client-side calculation only if an
+        // older cached status JSON (pre-correction) is being served.
         let estAQHI = "—";
-        if (hasAvg && !isNaN(avgPm)) {
+        let boxColor = "#9CA3AF";
+        if (hasCorrected) {
+          // >10.5 threshold matches get_color_for_aqhi() in
+          // update_light_pa.py exactly, so the "10+" text and the
+          // server-computed box colour never disagree at the boundary.
+          estAQHI = correctedAqhi > 10.5 ? "10+" : Math.round(correctedAqhi);
+          boxColor = colorHex || "#9CA3AF";
+        } else if (hasAvg && !isNaN(avgPm)) {
           let val = Math.floor(avgPm / 10) + 1;
           estAQHI = val > 10 ? "10+" : val;
+          boxColor = pmToColor(avgPm);
         }
 
 
@@ -503,6 +516,18 @@
           ? light.used_pm25_corr
           : null;
 
+        // Server-computed values (update_light_pa.py), seasonally corrected
+        // (white paper Section 5.4) - read directly rather than
+        // recomputing client-side, so this page can't drift out of sync
+        // with what the bulb actually shows.
+        const comparison = data.comparison || null;
+        const correctedAqhi = comparison && typeof comparison.estimated_aqhi_corrected === "number"
+          ? comparison.estimated_aqhi_corrected
+          : null;
+        const colorHex = typeof light.color_hex_category === "string"
+          ? light.color_hex_category
+          : null;
+
         const nSensors = Array.isArray(light.used_sensor_indices)
           ? light.used_sensor_indices.length
           : 0;
@@ -526,6 +551,8 @@
         const props = {
           generatedAtLocal,
           avgPm,
+          correctedAqhi,
+          colorHex,
           nSensors,
           lat,
           lon
