@@ -6,6 +6,9 @@ import csv
 import colorsys
 from datetime import datetime, timedelta, timezone
 
+import statistics
+from zoneinfo import ZoneInfo
+
 import requests
 import argparse
 import pandas as pd
@@ -28,6 +31,15 @@ LIFX_DEVICE_ID = "D073D5D54604"
 # sends any command to the bulb, so two controllers never fight over it.
 DRIVE_BULB = False
 BULB_DRIVEN_BY = "dklinux lifx_lights (map method: PurpleAir + regional O3/NO2, local PM2.5 override)"
+
+# The page and status JSON show the SAME number as the bulb: map_method_aqhi()
+# below repeats lifx_lights.community_aqhi() on the same AB_PM25_map.json
+# (the dklinux runner reads its local copy, this reads the committed one).
+# Keep the two in step. The old seasonal estimate is still logged for
+# continuity with the paper's dataset.
+PA_MAP_URL = "https://raw.githubusercontent.com/DKevinM/AB_datapull/main/data/AB_PM25_map.json"
+PA_MAP_MAX_AGE_H = 3
+AB_TZ = ZoneInfo("America/Edmonton")
 
 # Duration for LIFX color fade
 LIFX_DURATION_SEC = 60
@@ -535,7 +547,71 @@ COMPARISON_LOG_FIELDS = [
     "official_rounded",
     "diff_estimated_minus_official",
     "confidence",
+    "eaqhi_map",   # added 2026-10-05: the value the bulb + page show (map method)
 ]
+
+
+def map_method_aqhi(sensor_ids):
+    """Town AQHI by the LiveMap rule, from the AB PurpleAir map file:
+    max(AQHI formula on the 3 h PM2.5 + map O3/NO2, PM-only floor(pm/10)+1),
+    after the same fault handling as lifx_lights.community_aqhi() (3+
+    sensors: outlier rule; 2 that disagree: the lower; 1 the map questioned:
+    no override). Returns (aqhi int, note) or (None, reason)."""
+    try:
+        r = requests.get(PA_MAP_URL, timeout=30)
+        r.raise_for_status()
+        pa_map = {int(x["sensor_index"]): x for x in r.json()}
+    except Exception as e:
+        return None, f"map data unavailable ({str(e)[:80]})"
+
+    now = datetime.now(timezone.utc)
+    recs = []
+    for sid in sensor_ids:
+        x = pa_map.get(int(sid))
+        try:
+            pm = float(x["pm_corr"])
+            seen = datetime.strptime(x["last_seen"], "%Y-%m-%d %I:%M:%S %p").replace(tzinfo=AB_TZ)
+        except (TypeError, KeyError, ValueError):
+            continue
+        if x.get("use_for_map") is False or not math.isfinite(pm):
+            continue
+        if (now - seen).total_seconds() > PA_MAP_MAX_AGE_H * 3600:
+            continue
+        recs.append(x)
+    if not recs:
+        return None, "no fresh sensors in the map data"
+
+    note = ""
+    pms = [float(x["pm_corr"]) for x in recs]
+    if len(recs) >= 3:
+        med = statistics.median(pms)
+        keep = [abs(p - med) <= max(OUTLIER_MIN_ABS_DIFF, OUTLIER_MEDIAN_RATIO * med) for p in pms]
+        recs = [x for x, k in zip(recs, keep) if k]
+    elif len(recs) == 2:
+        lo, hi = sorted(pms)
+        if hi - lo > max(OUTLIER_MIN_ABS_DIFF, OUTLIER_MEDIAN_RATIO * lo):
+            recs = [recs[pms.index(lo)]]
+            note = "2 sensors disagreed, lower used; "
+
+    pm_now = sum(float(x["pm_corr"]) for x in recs) / len(recs)
+    pm3s = [float(x["pm25_3h"]) for x in recs if x.get("pm25_3h") is not None]
+    pm3 = sum(pm3s) / len(pm3s) if pm3s else pm_now
+    pm_only = math.floor(pm_now / 10) + 1
+    gases = [(x["o3_ppb"], x["no2_ppb"]) for x in recs
+             if x.get("aqhi_method") == "regional_gas" and x.get("o3_ppb") is not None and x.get("no2_ppb") is not None]
+    if gases:
+        o3 = sum(g[0] for g in gases) / len(gases)
+        no2 = sum(g[1] for g in gases) / len(gases)
+        formula = round((1000.0 / 10.4) * (math.exp(0.000537 * o3) + math.exp(0.000871 * no2)
+                                           + math.exp(0.000487 * pm3) - 3.0))
+        questioned = len(recs) == 1 and recs[0].get("aqhi_override") == "questioned"
+        aqhi = formula if questioned else max(formula, pm_only)
+        note += f"PurpleAir + regional O3 {o3:.0f} / NO2 {no2:.0f} ppb" + ("" if formula >= pm_only or questioned else ", set by local PM2.5")
+    else:
+        raws = [float(x["aqhi_rg_raw"]) for x in recs if x.get("aqhi_rg_raw") is not None]
+        aqhi = round(sum(raws) / len(raws)) if raws else pm_only
+        note += "PurpleAir + seasonal adjustment (regional gases unavailable)"
+    return min(max(int(aqhi), 1), 10), note
 
 
 def append_comparison_row(row, path=COMPARISON_LOG_PATH):
@@ -547,7 +623,7 @@ def append_comparison_row(row, path=COMPARISON_LOG_PATH):
     file_exists = os.path.isfile(path)
     try:
         with open(path, "a", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=COMPARISON_LOG_FIELDS)
+            writer = csv.DictWriter(f, fieldnames=COMPARISON_LOG_FIELDS, extrasaction="ignore")
             if not file_exists:
                 writer.writeheader()
             writer.writerow(row)
@@ -591,11 +667,18 @@ def build_comparison_row(usable, used_sensor_indices, avg_pm25_corr):
     # that's what's actually driving the bulb colour now (see main()) -
     # confidence should reflect the accuracy of what's displayed, not of
     # an intermediate value nothing downstream uses anymore.
+    # Since 2026-10-05 the displayed value is the map-method eAQHI (same as
+    # the bulb); fall back to the seasonal estimate only if it's unavailable.
+    eaqhi_map, eaqhi_map_note = map_method_aqhi(used_sensor_indices)
+    row["eaqhi_map"] = eaqhi_map
+    row["eaqhi_map_note"] = eaqhi_map_note
+    shown = eaqhi_map if eaqhi_map is not None else estimated_aqhi_corrected
+    row["eaqhi_shown"] = shown
     if aqhi_compare:
         row["official_weighted_avg"] = round(aqhi_compare["avg"], 2)
         row["official_rounded"] = aqhi_compare["rounded"]
-        row["diff_estimated_minus_official"] = round(estimated_aqhi_corrected - aqhi_compare["rounded"], 2)
-        row["confidence"] = classify_confidence(estimated_aqhi_corrected, aqhi_compare["rounded"])
+        row["diff_estimated_minus_official"] = round(shown - aqhi_compare["rounded"], 2)
+        row["confidence"] = classify_confidence(shown, aqhi_compare["rounded"])
     else:
         row["official_weighted_avg"] = None
         row["official_rounded"] = None
@@ -885,12 +968,13 @@ def main():
     append_comparison_row(comparison_row)
     print(
         f"Estimated AQHI={comparison_row['estimated_aqhi']} "
-        f"(seasonally corrected: {comparison_row['estimated_aqhi_corrected']}) vs "
+        f"(seasonally corrected: {comparison_row['estimated_aqhi_corrected']}; "
+        f"map method, shown + on the bulb: {comparison_row['eaqhi_map']} - {comparison_row['eaqhi_map_note']}) vs "
         f"official (3-closest, weighted)={comparison_row['official_rounded']} "
         f"-> confidence={comparison_row['confidence']}"
     )
 
-    color = get_color_for_aqhi(comparison_row["estimated_aqhi_corrected"])
+    color = get_color_for_aqhi(comparison_row["eaqhi_shown"])
 
     print(
         f"Using {len(usable)} sensors {used_sensor_indices}: "

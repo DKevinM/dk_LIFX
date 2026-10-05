@@ -364,14 +364,14 @@
         }
       
         // ---------- DATA AVAILABLE ----------
-        const { generatedAtLocal, avgPm, correctedAqhi, colorHex, nSensors, lat, lon } = props;
+        const { generatedAtLocal, avgPm, correctedAqhi, methodNote, colorHex, nSensors, lat, lon } = props;
 
         const hasAvg = typeof avgPm === "number";
         const hasCorrected = typeof correctedAqhi === "number" && !isNaN(correctedAqhi);
 
-        // Prefer the server-computed, seasonally-corrected values
-        // (comparison.estimated_aqhi_corrected / light.color_hex_category)
-        // - this is what the physical bulb is actually showing. Fall back
+        // Prefer the server-computed values (comparison.eaqhi_shown /
+        // light.color_hex_category) - this is what the physical bulb is
+        // actually showing. Fall back
         // to the old raw-PM2.5-only client-side calculation only if an
         // older cached status JSON (pre-correction) is being served.
         let estAQHI = "—";
@@ -436,6 +436,7 @@
               estimated AQHI: ${estAQHI}
             </div>
           </div>
+          ${methodNote ? `<div class="info-small" style="margin-top:4px;">Same as the light. ${methodNote}</div>` : ""}
           
           <div style="margin-top:6px;">
             ${comparisonHTML}
@@ -516,14 +517,21 @@
           ? light.used_pm25_corr
           : null;
 
-        // Server-computed values (update_light_pa.py), seasonally corrected
-        // (white paper Section 5.4) - read directly rather than
-        // recomputing client-side, so this page can't drift out of sync
-        // with what the bulb actually shows.
+        // Server-computed values (update_light_pa.py) - read directly rather
+        // than recomputing client-side, so this page can't drift out of sync
+        // with what the bulb shows. Since 2026-10-05 that's eaqhi_shown, the
+        // map-method value (PurpleAir + regional O3/NO2, local PM2.5 when
+        // higher) - the same number as the bulb and the LiveMap dots. Older
+        // status files only have the seasonally corrected estimate.
         const comparison = data.comparison || null;
-        const correctedAqhi = comparison && typeof comparison.estimated_aqhi_corrected === "number"
-          ? comparison.estimated_aqhi_corrected
-          : null;
+        const correctedAqhi = comparison && typeof comparison.eaqhi_shown === "number"
+          ? comparison.eaqhi_shown
+          : comparison && typeof comparison.estimated_aqhi_corrected === "number"
+            ? comparison.estimated_aqhi_corrected
+            : null;
+        const methodNote = comparison && comparison.eaqhi_map_note && typeof comparison.eaqhi_map === "number"
+          ? comparison.eaqhi_map_note
+          : "";
         const colorHex = typeof light.color_hex_category === "string"
           ? light.color_hex_category
           : null;
@@ -552,6 +560,7 @@
           generatedAtLocal,
           avgPm,
           correctedAqhi,
+          methodNote,
           colorHex,
           nSensors,
           lat,
