@@ -20,6 +20,15 @@ PURPLEAIR_SENSORS = [166965,83971,91545,249949]  # Evansburg / Entwistle
 # LIFX_DEVICE_ID = "d073d568e6e8"
 LIFX_DEVICE_ID = "D073D5D54604"
 
+# 2026-10-05: the Evansburg bulb is now driven from dklinux
+# (/opt/airquality/lifx_lights, source "pa_community"), using the same AQHI
+# rule as the LiveMap PurpleAir dots: the 4 sensors' average PM2.5 + ECCC /
+# station O3 and NO2, with local PM2.5 taking over when higher. This workflow
+# keeps logging the comparison and writing the status JSON, but no longer
+# sends any command to the bulb, so two controllers never fight over it.
+DRIVE_BULB = False
+BULB_DRIVEN_BY = "dklinux lifx_lights (map method: PurpleAir + regional O3/NO2, local PM2.5 override)"
+
 # Duration for LIFX color fade
 LIFX_DURATION_SEC = 60
 
@@ -701,6 +710,9 @@ def set_lifx_color(color_hex: str):
     """
     Call LIFX HTTP API to set the bulb color.
     """
+    if not DRIVE_BULB:
+        print(f"Bulb not driven from here (now driven by {BULB_DRIVEN_BY}); would have sent {color_hex}.")
+        return
     url = f"https://api.lifx.com/v1/lights/id:{LIFX_DEVICE_ID}/state"
     headers = {
         "Authorization": f"Bearer {LIFX_API_KEY}",
@@ -763,6 +775,7 @@ def build_status_payload(
             "used_pm25_corr": used_pm25_corr,
             "color_hex": used_color_hex,
             "duration_sec": LIFX_DURATION_SEC,
+            "driven_by": "dk_LIFX" if DRIVE_BULB else BULB_DRIVEN_BY,
         },
         "comparison": comparison,
     }
