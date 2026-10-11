@@ -1,10 +1,10 @@
 {
-  "generated_at_utc": "2026-10-11T01:19:46.723319+00:00",
+  "generated_at_utc": "2026-10-11T01:56:40.587543+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1791681471,
-      "last_seen_iso_utc": "2026-10-11T01:17:51+00:00",
+      "last_seen": 1791683751,
+      "last_seen_iso_utc": "2026-10-11T01:55:51+00:00",
       "humidity": 80,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
@@ -20,14 +20,14 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1791681572,
-      "last_seen_iso_utc": "2026-10-11T01:19:32+00:00",
+      "last_seen": 1791683732,
+      "last_seen_iso_utc": "2026-10-11T01:55:32+00:00",
       "humidity": 100,
-      "pm25_atm": 1.2,
-      "pm25_atm_a": 1.5,
-      "pm25_atm_b": 1.0,
-      "pm25_best": 1.2,
-      "pm25_corr": 0.7692307692307692,
+      "pm25_atm": 0.2,
+      "pm25_atm_a": 0.4,
+      "pm25_atm_b": 0.1,
+      "pm25_best": 0.2,
+      "pm25_corr": 0.12820512820512822,
       "pm_method": "avg",
       "is_fresh": true,
       "name": "WCAS_Entwistle1(AQSU-6463)",
@@ -37,8 +37,8 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1791681546,
-      "last_seen_iso_utc": "2026-10-11T01:19:06+00:00",
+      "last_seen": 1791683706,
+      "last_seen_iso_utc": "2026-10-11T01:55:06+00:00",
       "humidity": 75,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
@@ -78,7 +78,7 @@
       91545,
       166965
     ],
-    "used_pm25_corr": 0.2564102564102564,
+    "used_pm25_corr": 0.04273504273504274,
     "color_hex": "#01cbff",
     "duration_sec": 60,
     "driven_by": "dklinux lifx_lights (map method: PurpleAir + regional O3/NO2, local PM2.5 override)",
@@ -87,10 +87,10 @@
     "confidence": "high"
   },
   "comparison": {
-    "timestamp_utc": "2026-10-11T01:19:46.420577+00:00",
+    "timestamp_utc": "2026-10-11T01:56:40.451478+00:00",
     "n_sensors_used": 3,
     "used_sensor_indices": "83971;91545;166965",
-    "pm25_corr_avg": 0.26,
+    "pm25_corr_avg": 0.04,
     "estimated_aqhi": 1,
     "estimated_aqhi_corrected": 1.65,
     "site_lat": 53.597321666666666,
