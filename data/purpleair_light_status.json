@@ -1,10 +1,10 @@
 {
-  "generated_at_utc": "2026-10-18T20:35:08.516035+00:00",
+  "generated_at_utc": "2026-10-18T21:04:52.835947+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1792355618,
-      "last_seen_iso_utc": "2026-10-18T20:33:38+00:00",
+      "last_seen": 1792357419,
+      "last_seen_iso_utc": "2026-10-18T21:03:39+00:00",
       "humidity": 24,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
@@ -20,8 +20,8 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1792355609,
-      "last_seen_iso_utc": "2026-10-18T20:33:29+00:00",
+      "last_seen": 1792357409,
+      "last_seen_iso_utc": "2026-10-18T21:03:29+00:00",
       "humidity": 27,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
@@ -37,9 +37,9 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1792355579,
-      "last_seen_iso_utc": "2026-10-18T20:32:59+00:00",
-      "humidity": 23,
+      "last_seen": 1792357380,
+      "last_seen_iso_utc": "2026-10-18T21:03:00+00:00",
+      "humidity": 22,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -54,9 +54,9 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1792355379,
-      "last_seen_iso_utc": "2026-10-18T20:29:39+00:00",
-      "humidity": 23,
+      "last_seen": 1792357174,
+      "last_seen_iso_utc": "2026-10-18T20:59:34+00:00",
+      "humidity": 22,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -88,7 +88,7 @@
     "confidence": "high"
   },
   "comparison": {
-    "timestamp_utc": "2026-10-18T20:35:08.389135+00:00",
+    "timestamp_utc": "2026-10-18T21:04:52.749495+00:00",
     "n_sensors_used": 4,
     "used_sensor_indices": "83971;91545;166965;249949",
     "pm25_corr_avg": 0.0,
@@ -106,7 +106,7 @@
     "station3_km": 61.42,
     "station3_aqhi": 2.0,
     "eaqhi_map": 1,
-    "eaqhi_map_note": "PurpleAir + regional O3 21 / NO2 1 ppb",
+    "eaqhi_map_note": "PurpleAir + regional O3 25 / NO2 1 ppb",
     "eaqhi_shown": 1,
     "official_weighted_avg": 2.0,
     "official_rounded": 2,
