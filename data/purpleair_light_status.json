@@ -1,11 +1,11 @@
 {
-  "generated_at_utc": "2026-10-23T09:38:36.705006+00:00",
+  "generated_at_utc": "2026-10-23T10:06:24.344444+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1792748201,
-      "last_seen_iso_utc": "2026-10-23T09:36:41+00:00",
-      "humidity": 78,
+      "last_seen": 1792749882,
+      "last_seen_iso_utc": "2026-10-23T10:04:42+00:00",
+      "humidity": 79,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -20,8 +20,8 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1792748197,
-      "last_seen_iso_utc": "2026-10-23T09:36:37+00:00",
+      "last_seen": 1792749877,
+      "last_seen_iso_utc": "2026-10-23T10:04:37+00:00",
       "humidity": 100,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
@@ -37,9 +37,9 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1792748281,
-      "last_seen_iso_utc": "2026-10-23T09:38:01+00:00",
-      "humidity": 73,
+      "last_seen": 1792749842,
+      "last_seen_iso_utc": "2026-10-23T10:04:02+00:00",
+      "humidity": 74,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -54,9 +54,9 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1792748219,
-      "last_seen_iso_utc": "2026-10-23T09:36:59+00:00",
-      "humidity": 83,
+      "last_seen": 1792749909,
+      "last_seen_iso_utc": "2026-10-23T10:05:09+00:00",
+      "humidity": 86,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -88,7 +88,7 @@
     "confidence": "high"
   },
   "comparison": {
-    "timestamp_utc": "2026-10-23T09:38:36.607572+00:00",
+    "timestamp_utc": "2026-10-23T10:06:24.211191+00:00",
     "n_sensors_used": 4,
     "used_sensor_indices": "83971;91545;166965;249949",
     "pm25_corr_avg": 0.0,
@@ -106,7 +106,7 @@
     "station3_km": 61.42,
     "station3_aqhi": 2.0,
     "eaqhi_map": 2,
-    "eaqhi_map_note": "PurpleAir + regional O3 26 / NO2 1 ppb",
+    "eaqhi_map_note": "PurpleAir + regional O3 30 / NO2 1 ppb",
     "eaqhi_shown": 2,
     "official_weighted_avg": 2.0,
     "official_rounded": 2,
