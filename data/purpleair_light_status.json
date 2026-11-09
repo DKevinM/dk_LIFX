@@ -1,11 +1,11 @@
 {
-  "generated_at_utc": "2026-11-09T09:32:04.868557+00:00",
+  "generated_at_utc": "2026-11-09T10:04:30.189129+00:00",
   "sensors": [
     {
       "sensor_index": 83971,
-      "last_seen": 1794216635,
-      "last_seen_iso_utc": "2026-11-09T09:30:35+00:00",
-      "humidity": 43,
+      "last_seen": 1794218556,
+      "last_seen_iso_utc": "2026-11-09T10:02:36+00:00",
+      "humidity": 45,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -20,9 +20,9 @@
     },
     {
       "sensor_index": 91545,
-      "last_seen": 1794216666,
-      "last_seen_iso_utc": "2026-11-09T09:31:06+00:00",
-      "humidity": 46,
+      "last_seen": 1794218586,
+      "last_seen_iso_utc": "2026-11-09T10:03:06+00:00",
+      "humidity": 52,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -37,9 +37,9 @@
     },
     {
       "sensor_index": 166965,
-      "last_seen": 1794216659,
-      "last_seen_iso_utc": "2026-11-09T09:30:59+00:00",
-      "humidity": 41,
+      "last_seen": 1794218579,
+      "last_seen_iso_utc": "2026-11-09T10:02:59+00:00",
+      "humidity": 42,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -54,9 +54,9 @@
     },
     {
       "sensor_index": 249949,
-      "last_seen": 1794216616,
-      "last_seen_iso_utc": "2026-11-09T09:30:16+00:00",
-      "humidity": 52,
+      "last_seen": 1794218417,
+      "last_seen_iso_utc": "2026-11-09T10:00:17+00:00",
+      "humidity": 47,
       "pm25_atm": 0.0,
       "pm25_atm_a": 0.0,
       "pm25_atm_b": 0.0,
@@ -88,7 +88,7 @@
     "confidence": "high"
   },
   "comparison": {
-    "timestamp_utc": "2026-11-09T09:32:04.784333+00:00",
+    "timestamp_utc": "2026-11-09T10:04:30.092594+00:00",
     "n_sensors_used": 4,
     "used_sensor_indices": "83971;91545;166965;249949",
     "pm25_corr_avg": 0.0,
@@ -106,7 +106,7 @@
     "station3_km": 61.42,
     "station3_aqhi": 2.0,
     "eaqhi_map": 2,
-    "eaqhi_map_note": "PurpleAir + regional O3 33 / NO2 1 ppb",
+    "eaqhi_map_note": "PurpleAir + regional O3 33 / NO2 0 ppb",
     "eaqhi_shown": 2,
     "official_weighted_avg": 2.0,
     "official_rounded": 2,
