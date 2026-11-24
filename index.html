@@ -121,7 +121,8 @@
         const d = new Date(isoString);
         // Force Edmonton timezone regardless of user location
         return d.toLocaleString("en-CA", {
-          timeZone: "America/Edmonton",
+          // UTC-6 from 2026-11-01 (old browser tz data says UTC-7); earlier dates keep the real Edmonton rules
+          timeZone: +d >= Date.UTC(2026, 10, 1, 8) ? "Etc/GMT+6" : "America/Edmonton",
           year: "numeric",
           month: "2-digit",
           day: "2-digit",

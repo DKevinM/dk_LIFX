@@ -180,9 +180,18 @@
       endEl.valueAsDate   = now;
     }
 
+    // Alberta: UTC-6 all year from 2026-11-01 (it would have fallen back at 08:00 UTC that day). Browsers with
+    // old tz data still put America/Edmonton at UTC-7 after that, so later times use a fixed UTC-6; earlier
+    // times keep America/Edmonton's real rules (MST in past winters). Plotly draws Date objects on the
+    // visitor's own clock, so chart x values are Alberta wall-clock strings from abWall() instead (2026-11-24).
+    function abTZ(ts) { return +new Date(ts) >= Date.UTC(2026, 10, 1, 8) ? "Etc/GMT+6" : "America/Edmonton"; }
+    function abWall(ts) {
+      return new Date(ts).toLocaleString("sv-SE", { timeZone: abTZ(ts), hour12: false }).replace(",", "");
+    }
+
     function toEdmontonString(ts) {
       return new Date(ts).toLocaleString("en-CA", {
-        timeZone: "America/Edmonton",
+        timeZone: abTZ(ts),
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
@@ -316,7 +325,7 @@
             if (pmCorr == null || isNaN(pmCorr)) return;
 
             const ts = new Date(row.recorded_at);
-            x.push(ts);
+            x.push(abWall(row.recorded_at));
             y.push(pmCorr);
 
             const local = toEdmontonString(row.recorded_at);
